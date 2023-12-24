@@ -1,0 +1,5 @@
+export const baseUrl = 'http://localhost:8000'
+export const loginUrl = baseUrl + '/auth/login'
+export const refreshUrl = baseUrl + '/auth/refresh'
+export const signupUrl = baseUrl + '/auth/signup'
+export const logoutUrl = baseUrl + '/auth/logout'
