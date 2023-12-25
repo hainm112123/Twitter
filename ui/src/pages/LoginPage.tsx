@@ -7,13 +7,14 @@ import { useCookies } from "react-cookie";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { login } from "../redux/authSlice";
+import { access_token_life, refresh_token_life } from '../variables/variables';
 
 type Props = {}
 
 const LoginPage = (props: Props) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [ cookies ] = useCookies();
+  const [ cookies, setCookie ] = useCookies();
   
   const access_token = useSelector((state: RootState) => state.auth.access_token) ?? cookies.access_token;
   useEffect(() => {
@@ -26,9 +27,11 @@ const LoginPage = (props: Props) => {
   const [password, setPassword] = useState("");
 
   const onSubmit = async (data: {username: string, password: string}) => {
-    const loginSuccessed = await dispatch(login(data))
-    if (loginSuccessed) {
-      navigate('/')
+    const token = await dispatch(login(data))
+    if (token) {
+      setCookie('access_token', token.access_token, {path: '/', expires: new Date(Date.now() + access_token_life)});
+      setCookie('refresh_token', token.refresh_token, {path: '/', expires: new Date(Date.now() + refresh_token_life)});
+      navigate('/');
     }
     else {
       alert('fail')

@@ -8,6 +8,7 @@ import RightSidebar from '../common/RightSidebar';
 import { useCookies } from 'react-cookie';
 import { RootState, useAppDispatch } from '../../redux/store';
 import { useSelector } from 'react-redux';
+import { getOtherUsers, getUserIdentity } from '../../redux/userSlice';
 
 function MainLayout() {
   const [ cookies ] = useCookies();
@@ -23,6 +24,8 @@ function MainLayout() {
       navigate('/auth/login')
       return;
     }
+    dispatch(getUserIdentity());
+    dispatch(getOtherUsers());
   }, [navigate, access_token, refresh_token, dispatch])
 
   return (

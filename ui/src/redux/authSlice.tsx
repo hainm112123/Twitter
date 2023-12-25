@@ -39,17 +39,17 @@ export const login = ({ username, password }: {username: string, password: strin
       loginUrl,
       axios.toFormData({username, password})
     );
-    console.log({username, password})
+    // console.log({username, password})
     if (res.data.access_token) {
       dispatch(loginSuccess(res.data));
-      return true;
+      return res.data
     }
     else {
-      return false;
+      return null;
     }
   } catch(err) {
     console.error(err)
-    return false;
+    return null;
   }
 }
 
@@ -64,13 +64,20 @@ export const refresh = (refresh_token: string) => async (dispatch: AppDispatch) 
     }
   )
   dispatch(refreshSuccess(res.data))
+  return res.data;
 }
 
 export const signup = ({name, username, password, retype_password} : {name: string, username: string, password: string, retype_password: string}) => async (dispatch: AppDispatch) => {
-  await axios.post(
+  const res = await axios.post(
     signupUrl,
-    {name, username, password, retype_password}
+    axios.toFormData({name, username, password, retype_password})
   )
+  if (res.status === 200) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 export const logout = ({access_token, refresh_token} : {access_token: string, refresh_token: string}) => async (dispatch: AppDispatch) => {
@@ -87,7 +94,7 @@ export const logout = ({access_token, refresh_token} : {access_token: string, re
     axios.delete(
       logoutUrl,
       {
-        headers: {
+        headers: {      
           Authorization: `Bearer ${refresh_token}`
         }
       }

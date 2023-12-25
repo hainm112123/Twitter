@@ -1,11 +1,14 @@
-from models import User
 from flask import Blueprint, request, jsonify
 from forms import SignupForm, LoginForm
-from db import db
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
+from flask_cors import CORS, cross_origin
+
+from models import User
+from db import db
 from init import jwt_redis_blocklist, ACCESS_EXPIRES, jwt
 
 auth = Blueprint('auth', __name__)
+# cors = CORS(auth, resources={r"/foo": {"origins": "http://localhost:3000"}})
 
 @auth.route('/signup', methods=['POST'])
 def signup():
@@ -16,11 +19,12 @@ def signup():
                 password=form.password.data)
     
     user.add()
-    return jsonify(user)
+    return {"msg": "success"}, 200
   else:
-    return form.errors
+    return form.errors, 401
 
 @auth.route('/login', methods=['POST'])
+# @cross_origin(origin='localhost',headers=['Content-Type','Authorization'])
 def login():
   form = LoginForm(request.form)
   if form.validate_on_submit():
@@ -49,11 +53,11 @@ def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
 
 @auth.route('/logout', methods=['DELETE'])
 @jwt_required(verify_type=False)
+# @cross_origin(origin='localhost',headers=['Content-Type','Authorization'])
 def logout():
   token = get_jwt()
   jti = token['jti']
   token_type = token['type']
   jwt_redis_blocklist.set(jti, "", ex=ACCESS_EXPIRES)
   return jsonify(msg=f"{token_type.capitalize()} token successfully revoked")
-  
 

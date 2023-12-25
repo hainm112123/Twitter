@@ -2,12 +2,14 @@ import { Box } from "@mui/material"
 import { sizeConfig } from "../../configs/sizeConfig"
 import { colorConfig } from "../../configs/colorConfig"
 import { fontConfig } from "../../configs/fontConfig"
+import { UserIdentity } from "../../types/UserIdentity"
 
 type Props = {
-  self: boolean
+  self: boolean,
+  userIdentity: UserIdentity,
 }
 
-const UserInfor = (props: Props) => {
+const UserInfor = ({self, userIdentity}: Props) => {
   return (
     <Box
       sx={{
@@ -36,18 +38,18 @@ const UserInfor = (props: Props) => {
             fontWeight: fontConfig.weight.author
           }}
         >
-          yuuhi
+          {userIdentity.name}
         </Box>
         <Box
           sx={{
             color: fontConfig.color.secondaryText
           }}
         >
-          @yuuhi
+          @{userIdentity.username}
         </Box>
       </Box>
       {
-        !props.self && <Box
+        !self && <Box
           sx={{
             bgcolor: colorConfig.followBtnBg,
             color: fontConfig.color.followBtn,

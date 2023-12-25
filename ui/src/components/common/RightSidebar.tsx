@@ -4,10 +4,14 @@ import { colorConfig } from "../../configs/colorConfig";
 import { sizeConfig } from "../../configs/sizeConfig";
 import { fontConfig } from "../../configs/fontConfig";
 import UserInfor from "./UserInfor";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 type Props = {}
 
 const RightSidebar = (props: Props) => {
+  const otherUsers = useSelector((state: RootState) => state.user.others);
+
   return (
     <Box
       sx={{
@@ -35,17 +39,15 @@ const RightSidebar = (props: Props) => {
           Who to follow
         </Box>
         <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <UserInfor self={false}/>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton>
-              <UserInfor self={false}/>
-            </ListItemButton>
-          </ListItem>
+          {
+            otherUsers.map((user, index) => (
+              <ListItem disablePadding key={index}>
+                <ListItemButton>
+                  <UserInfor self={false} userIdentity={user} />
+                </ListItemButton>
+              </ListItem>
+            ))
+          }
         </List>
       </Box>
     </Box>

@@ -35,6 +35,7 @@ const LeftSidebar = (props: Props) => {
   const token = useSelector((state: RootState) => state.auth);
   const access_token = token.access_token ?? cookies.access_token;
   const refresh_token = token.refresh_token ?? cookies.refresh_token;
+  const userIdentity = useSelector((state: RootState) => state.user.userIdentity)
 
   const onLogoutClicked = () => {
     removeCookie('access_token', {path: '/'});
@@ -145,11 +146,12 @@ const LeftSidebar = (props: Props) => {
         <List>
           <ListItem disablePadding>
             <ListItemButton onClick={onLogoutClicked}>
-              <ListItemText disableTypography>Log out @yuuhi</ListItemText>
+              <ListItemText disableTypography>Log out @{userIdentity?.username}</ListItemText>
             </ListItemButton>
           </ListItem>
         </List>
       </Box>
+      
       <Box
         sx={{
           marginRight: "16px",
@@ -168,7 +170,7 @@ const LeftSidebar = (props: Props) => {
             }
           }}
         >
-          <UserInfor self={true} />
+          {userIdentity && <UserInfor self={true} userIdentity={userIdentity}/>}
         </Button>
 
         <Box
