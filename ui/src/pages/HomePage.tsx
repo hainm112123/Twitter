@@ -2,27 +2,17 @@ import { Box } from "@mui/material";
 import React from "react";
 import Tweet from "../components/common/Tweet";
 import { colorConfig } from "../configs/colorConfig";
+import Header from "../components/common/Header";
 
 type Props = {}
 
 const HomePage = (props: Props) => {
   return (
     <Box>
-      <Box
+      <Header
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          textAlign: "center",
           paddingTop: "16px",
           paddingBottom: "16px",
-          border: 1,
-          borderTop: 0,
-          borderColor: colorConfig.border,
-          position: "sticky",
-          top: 0,
-          right: 0,
-          left: 0,
-          bgcolor: colorConfig.bluredMainBg,  
         }}
       >
         <Box
@@ -39,7 +29,7 @@ const HomePage = (props: Props) => {
         >
           Following
         </Box>
-      </Box>
+      </Header>
       <Tweet/>
       <Tweet/>
       <Tweet/>

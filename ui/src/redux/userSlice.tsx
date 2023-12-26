@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { AppDispatch } from "./store"
 import axios from "axios"
-import { userIdentityUrl, userOthersUrl } from "../variables/urls"
+import { userIdentityUrl, userOthersUrl, userUrl } from "../variables/urls"
 import { UserIdentity } from "../types/UserIdentity"
 
 type userState = {
@@ -50,6 +50,12 @@ export const getOtherUsers = () => async (dispatch: AppDispatch) => {
   } catch(err) {
     console.error(err);
   }
+}
+
+export const getUser = (username: any) => async (dispatch: AppDispatch) => {
+  const res = await axios.get(userUrl + username);
+  console.log(res.data);
+  return res.data;
 }
 
 export const userSliceReducer = userSlice.reducer

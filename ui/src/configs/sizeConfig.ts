@@ -6,4 +6,6 @@ export const sizeConfig = {
   imgMaxHeight: "512px",
   interactBtnBR: "16px",
   sidebarBtnBR: "32px",
+  profileAvatar: "132px",
+  profileAvatarMT: "-80px",
 }

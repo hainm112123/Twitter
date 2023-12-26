@@ -87,7 +87,7 @@ const appRoutes: RouteType[] = [
   {
     element: <ProfilePage/>,
     state: "profile",
-    path: "/profile",
+    path: "/profile/:username/:tab?",
     sidebarProps: {
       displayText: "Profile",
       icon: <PersonOutline sx={{fontSize: fontConfig.size.primaryIcon}} />,

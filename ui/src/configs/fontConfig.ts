@@ -14,8 +14,10 @@ export const fontConfig = {
   },
   size: {
     secondaryText: "14px",
-    secondaryIcon: "20px",
     sidebarText: "20px",
+    text_1: "18px",
+    text_2: "15px",
+    secondaryIcon: "20px",
     primaryIcon: "30px",
     subHeader: "20px",
     header: "32px",

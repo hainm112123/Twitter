@@ -6,6 +6,7 @@ import { fontConfig } from "../../configs/fontConfig";
 import UserInfor from "./UserInfor";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { Link } from "react-router-dom";
 
 type Props = {}
 
@@ -36,15 +37,17 @@ const RightSidebar = (props: Props) => {
             padding: "8px 14px 0px",
           }}
         >
-          Who to follow
+          You might like
         </Box>
         <List>
           {
             otherUsers.map((user, index) => (
               <ListItem disablePadding key={index}>
-                <ListItemButton>
-                  <UserInfor self={false} userIdentity={user} />
-                </ListItemButton>
+                <Link style={{textDecoration: "none", color: "unset", flex: 1}} to={`/profile/${user.username}`}>
+                  <ListItemButton>
+                    <UserInfor self={false} userIdentity={user} />
+                  </ListItemButton>
+                </Link>
               </ListItem>
             ))
           }

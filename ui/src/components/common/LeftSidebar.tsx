@@ -61,7 +61,7 @@ const LeftSidebar = (props: Props) => {
           items.map((item, index) => (
             <ListItem key={index} disablePadding sx={{width: "fit-content"}}>
               <Link 
-                to={item.path}
+                to={item.state !== 'profile' ? item.path : '/profile/' + userIdentity?.username}
                 style={{
                   textDecoration: "none",
                   color: "unset"

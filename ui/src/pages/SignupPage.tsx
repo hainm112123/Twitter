@@ -1,7 +1,7 @@
 import { Box, Button, FormControl, Typography } from "@mui/material"
 import { Link, useNavigate } from "react-router-dom";
 import { styleConfig } from "../configs/styleConfig";
-import StyledTextField from "../components/common/StyledTextField";
+import StyledTextField from "../components/styled/StyledTextField";
 import { RootState, useAppDispatch } from "../redux/store";
 import { useCookies } from "react-cookie";
 import { useSelector } from "react-redux";
