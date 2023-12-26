@@ -10,6 +10,8 @@ import { useSelector } from 'react-redux';
 import { access_token_life, refresh_token_life } from './variables/variables';
 import { refresh } from './redux/authSlice';
 import axios from 'axios';
+import { getCsrfToken } from './redux/appSlice';
+import { baseUrl } from './variables/urls';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -18,7 +20,11 @@ function App() {
   const access_token = token.access_token ?? cookies.access_token;
   const refresh_token = token.refresh_token ?? cookies.refresh_token;
 
-  axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+  axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+  axios.defaults.baseURL = baseUrl;
+  axios.defaults.xsrfHeaderName = "X-CSRFToken";
+  axios.defaults.xsrfCookieName = "csrftoken";
+  axios.defaults.headers.common["X-CSRFToken"] = useSelector((state: RootState) => state.app.csrf_token)
   // console.log(access_token, refresh_token)
 
   // useEffect(() => {
@@ -52,6 +58,7 @@ function App() {
         func();
       }
     }
+    dispatch(getCsrfToken());
   }, [refresh_token, cookies, setCookie, dispatch])
 
   return (

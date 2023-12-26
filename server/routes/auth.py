@@ -23,20 +23,27 @@ def signup():
   else:
     return form.errors, 401
 
-@auth.route('/login', methods=['POST'])
+@auth.route('/login', methods=['GET', 'POST'])
 # @cross_origin(origin='localhost',headers=['Content-Type','Authorization'])
 def login():
   form = LoginForm(request.form)
-  if form.validate_on_submit():
-    user = User.query.filter_by(username=form.username.data).first()
-    if user and user.check_password(attempted_password=form.password.data):
-      access_token = create_access_token(identity=user)
-      refresh_token = create_refresh_token(identity=user)
-      return jsonify(access_token=access_token, refresh_token=refresh_token)
-    else:
-      return jsonify({"msg": "Wrong username or password"}), 401
+  if (request.method == 'GET'):
+    # print(form.csrf_token._value())
+    # # return ('', {'csrf_token': form.csrf_token._value()})
+    # return form.csrf_token._value()
+    pass
   else:
-    return form.errors
+    # print(request.method, type(form.csrf_token._value()))
+    if form.validate_on_submit():
+      user = User.query.filter_by(username=form.username.data).first()
+      if user and user.check_password(attempted_password=form.password.data):
+        access_token = create_access_token(identity=user)
+        refresh_token = create_refresh_token(identity=user)
+        return jsonify(access_token=access_token, refresh_token=refresh_token)
+      else:
+        return jsonify({"msg": "Wrong username or password"}), 401
+    else:
+      return form.errors
 
 @auth.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)

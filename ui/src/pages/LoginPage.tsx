@@ -8,6 +8,9 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { login } from "../redux/authSlice";
 import { access_token_life, refresh_token_life } from '../variables/variables';
+import { getCsrfToken } from "../redux/appSlice";
+import axios from "axios";
+import { baseUrl, csrfTokenUrl } from "../variables/urls";
 
 type Props = {}
 
@@ -15,19 +18,34 @@ const LoginPage = (props: Props) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [ cookies, setCookie ] = useCookies();
+  const [isLoaded, setLoaded] = useState(false)
+  // const [ csrf_token, setCsrf_token ] = useState();
   
   const access_token = useSelector((state: RootState) => state.auth.access_token) ?? cookies.access_token;
+
   useEffect(() => {
+    if (!isLoaded) {
+      setLoaded(true) 
+      return;
+    }
     if (access_token) {
       navigate('/');
     }
-  }, [navigate, access_token])
+    // axios.get('/auth/login').then(res => {
+    //   setCsrf_token(res.data);
+    //   // console.log(res)
+    // })
+    
+    // dispatch(getCsrfToken())
+  }, [navigate, access_token, dispatch, isLoaded])
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const csrf_token = useSelector((state: RootState) => state.app.csrf_token)
 
-  const onSubmit = async (data: {username: string, password: string}) => {
-    const token = await dispatch(login(data))
+  const onSubmit = async (username: string, password: string) => {
+    console.log(csrf_token);
+    const token = await dispatch(login({username, password, csrf_token}))
     if (token) {
       setCookie('access_token', token.access_token, {path: '/', expires: new Date(Date.now() + access_token_life)});
       setCookie('refresh_token', token.refresh_token, {path: '/', expires: new Date(Date.now() + refresh_token_life)});
@@ -75,7 +93,7 @@ const LoginPage = (props: Props) => {
         <Button
           type="submit"
           sx={styleConfig.auth.button}
-          onClick={() => onSubmit({username, password})}
+          onClick={() => onSubmit(username, password)}
         >
           Log in
         </Button>

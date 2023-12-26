@@ -10,6 +10,7 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 import redis
+from flask_wtf import CSRFProtect
 
 from db import db
 
@@ -27,6 +28,9 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 # cors = CORS(app, resources={r"/foo": {"origins": "http://localhost:3000"}})
 cors = CORS()
 cors.init_app(app)
+
+# csrf = CSRFProtect()
+# csrf.init_app(app)
 
 def handle_preflight():
   if request.method == 'OPTIONS':

@@ -18,6 +18,7 @@ class User(db.Model):
   followers: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
   following: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
   tweets: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
+  # avatar: Mapped[str] = mapped_column(String)
 
   def add(self):
     db.session.add(self)

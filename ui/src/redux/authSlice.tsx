@@ -33,20 +33,27 @@ export const authSlice = createSlice({
 
 export const { loginSuccess, refreshSuccess, logoutSuccess } = authSlice.actions;
 
-export const login = ({ username, password }: {username: string, password: string}) => async (dispatch: AppDispatch) => {
+export const login = ({ username, password, csrf_token }: {username: string, password: string, csrf_token: any}) => async (dispatch: AppDispatch) => {
   try {
     const res = await axios.post(
       loginUrl,
-      axios.toFormData({username, password})
+      axios.toFormData({username, password, csrf_token})
     );
-    // console.log({username, password})
+
     if (res.data.access_token) {
       dispatch(loginSuccess(res.data));
       return res.data
     }
     else {
+      console.log(res.data);
       return null;
     }
+
+    // const res = await fetch(loginUrl, {
+    //   method: "post",
+    //   body: JSON.stringify({username, password})
+    // })
+    // return res.json();
   } catch(err) {
     console.error(err)
     return null;

@@ -20,7 +20,7 @@ function MainLayout() {
   const refresh_token = token.refresh_token ?? cookies.refresh_token;
 
   useEffect(() => {
-    if (!access_token || !refresh_token) {
+    if (!refresh_token) {
       navigate('/auth/login')
       return;
     }
