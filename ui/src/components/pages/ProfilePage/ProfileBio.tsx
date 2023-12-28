@@ -9,6 +9,7 @@ import { useState } from "react"
 import theme from "../../styled/theme"
 import EditProfile from "./EditProfile"
 import ProfileAvatar from "./ProfileAvatar"
+import moment from "moment"
 
 type Props = {
   name: any,
@@ -102,7 +103,7 @@ const ProfileBio = (props: Props) => {
         <Typography sx={{
           mb: 2,
         }}>
-          Hi, I'm {props.name}
+          {props.bio}
         </Typography>
         
         <Box sx={{
@@ -112,7 +113,7 @@ const ProfileBio = (props: Props) => {
           mb: 2,
         }}>
           <CalendarMonthOutlined sx={{fontSize: fontConfig.size.secondaryIcon, marginRight: "4px"}} />
-          <Box>Joined December 2023</Box>
+          <Box>Joined {moment(props.joined_date).format('MMMM YYYY')}</Box>
         </Box>
 
         <Box sx={{

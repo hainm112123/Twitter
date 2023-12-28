@@ -51,7 +51,7 @@ def others():
   users = User.query.all()
   user = get_jwt_identity()
   users = [_user for _user in users if _user.id != user["id"]]
-  return users
+  return jsonify(list(map(configUser, users)))
 
 @user.route('/update-bio', methods=['POST'])
 @jwt_required()
@@ -70,9 +70,9 @@ def update_bio():
     user.name = new_user_bio["name"]
   if (new_user_bio["bio"]):
     user.bio = new_user_bio["bio"]
-  if (new_user_bio["cover"]):
+  if ("cover" in new_user_bio and new_user_bio["cover"]):
     user.cover = base64.decodebytes(new_user_bio["cover"].encode('utf-8'))
-  if (new_user_bio["avatar"]):
+  if ("avatar" in new_user_bio and new_user_bio["avatar"]):
     user.avatar = base64.decodebytes(new_user_bio["avatar"].encode('utf-8'))
   db.session.commit()
   return {"msg": "success"}, 200
