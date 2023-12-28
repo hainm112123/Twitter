@@ -12,6 +12,8 @@ import { refresh } from './redux/authSlice';
 import axios from 'axios';
 import { getCsrfToken } from './redux/appSlice';
 import { baseUrl } from './variables/urls';
+import { ThemeProvider } from '@mui/material';
+import theme from './components/styled/theme';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -62,15 +64,17 @@ function App() {
   }, [refresh_token, cookies, setCookie, dispatch])
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MainLayout/>}>
-          {routes}
-        </Route>
-        <Route path="/auth/login" element={<LoginPage/>}/>
-        <Route path="/auth/signup" element={<SignupPage/>}/>
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MainLayout/>}>
+            {routes}
+          </Route>
+          <Route path="/auth/login" element={<LoginPage/>}/>
+          <Route path="/auth/signup" element={<SignupPage/>}/>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

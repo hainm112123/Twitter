@@ -7,6 +7,7 @@ import ProfileTweets from "../components/pages/ProfilePage/ProfileTweets";
 import { getUser } from "../redux/userSlice";
 import { useParams } from "react-router-dom";
 import { useAppDispatch } from "../redux/store";
+import ProfileCover from "../components/pages/ProfilePage/ProfileCover";
 
 type Props = {}
 
@@ -20,6 +21,10 @@ const ProfilePage = (props: Props) => {
     tweets: [],
     followers: [],
     following: [],
+    cover: null,
+    avatar: null,
+    bio: "",
+    joined_date: null,
   });
 
   useEffect(() => {
@@ -39,17 +44,18 @@ const ProfilePage = (props: Props) => {
       {/* profile */}
       <ProfileHeader name={user.name} tweetsCount={user.tweets.length} />
 
-      <Box
-        sx={{
-          bgcolor: "#333639",
-          height: "200px",
-          overflow: "hidden",
-        }}
-      >
-        <Box/>
-      </Box>
+      <ProfileCover currentCover={user.cover} />
 
-      <ProfileBio name={user.name} username={user.username} followingCount={user.following.length} follwersCount={user.followers.length}  />
+      <ProfileBio 
+        name={user.name} 
+        username={user.username} 
+        followingCount={user.following.length} 
+        follwersCount={user.followers.length} 
+        currentAvatar={user.avatar} 
+        currentCover={user.cover} 
+        bio={user.bio}
+        joined_date={user.joined_date}
+      />
       <ProfileTabs />
       <ProfileTweets />
     </Box>

@@ -1,8 +1,9 @@
-import { Box } from "@mui/material"
+import { Box, Button, ThemeProvider } from "@mui/material"
 import { sizeConfig } from "../../configs/sizeConfig"
 import { colorConfig } from "../../configs/colorConfig"
 import { fontConfig } from "../../configs/fontConfig"
 import { UserIdentity } from "../../types/UserIdentity"
+import theme from "../styled/theme"
 
 type Props = {
   self: boolean,
@@ -49,17 +50,19 @@ const UserInfor = ({self, userIdentity}: Props) => {
         </Box>
       </Box>
       {
-        !self && <Box
-          sx={{
-            bgcolor: colorConfig.followBtnBg,
-            color: fontConfig.color.followBtn,
-            fontWeight: fontConfig.weight.bold,
-            padding: "4px 8px",
-            borderRadius: "14px"
-          }}
-        >
-          Follow
-        </Box>
+        !self && <ThemeProvider theme={theme}>
+          <Button 
+            className="light"
+            sx={{
+              padding: "2px 14px",
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+            }}
+          >
+            Follow
+          </Button>
+        </ThemeProvider>
       }
     </Box>
   )

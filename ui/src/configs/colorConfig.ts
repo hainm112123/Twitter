@@ -11,4 +11,5 @@ export const colorConfig = {
   primaryBtnBg: "#1d9af1",
   sidebarBtnHover: "rgba(231,233,234,0.1)",
   popOverShadow: "rgba(255, 255, 255, 0.2) 0px 0px 15px, rgba(255, 255, 255, 0.15) 0px 0px 3px 1px",
+  modelBackdrop: "rgba(91, 112, 131, 0.4)"
 }

@@ -1,9 +1,11 @@
-from sqlalchemy import String, ForeignKey, Integer, ARRAY
+from sqlalchemy import String, ForeignKey, Integer, ARRAY, LargeBinary, DateTime
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from db import db
 from dataclasses import dataclass
 from init import bcrypt
 from flask_login import UserMixin
+import base64
+from datetime import datetime
 
 # @login_manager.user_loader
 # def load_user(user_id):
@@ -18,7 +20,10 @@ class User(db.Model):
   followers: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
   following: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
   tweets: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
-  # avatar: Mapped[str] = mapped_column(String)
+  avatar: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
+  cover: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
+  bio: Mapped[str] = mapped_column(String, default="")
+  joined_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
   def add(self):
     db.session.add(self)

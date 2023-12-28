@@ -1,20 +1,29 @@
-import { Avatar, Box, Button, Typography } from "@mui/material"
+import { Avatar, Box, Button, Modal, ThemeProvider, Typography } from "@mui/material"
 import { sizeConfig } from "../../../configs/sizeConfig"
 import { fontConfig } from "../../../configs/fontConfig"
 import { colorConfig } from "../../../configs/colorConfig"
-import { CalendarMonthOutlined, PrivacyTipSharp } from "@mui/icons-material"
+import { CalendarMonthOutlined } from "@mui/icons-material"
 import { useSelector } from "react-redux"
 import { RootState } from "../../../redux/store"
+import { useState } from "react"
+import theme from "../../styled/theme"
+import EditProfile from "./EditProfile"
+import ProfileAvatar from "./ProfileAvatar"
 
 type Props = {
   name: any,
   username: any,
   follwersCount: any,
   followingCount: any,
+  currentAvatar: any,
+  currentCover: any,
+  bio: any,
+  joined_date: any,
 }
 
 const ProfileBio = (props: Props) => {
   const userIdentity = useSelector((state: RootState) => state.user.userIdentity);
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <Box
@@ -34,57 +43,40 @@ const ProfileBio = (props: Props) => {
           justifyContent: "space-between",
         }}
       >
-        <Box sx={{
-            marginTop: sizeConfig.profileAvatarMT,
-            border: "4px solid black",
-            borderRadius: sizeConfig.profileAvatar
-          }}
-        >
-          <Avatar sx={{
-            width: sizeConfig.profileAvatar,
-            height: sizeConfig.profileAvatar,
-          }} />
-        </Box>
+        {/* avatar */}
+        <ProfileAvatar sx={{}} currentAvatar={props.currentAvatar}/>
 
         {
-          userIdentity?.username === props.username && <Button
-            variant="contained"
-            sx={{
-              bgcolor: colorConfig.mainBg,
-              color: fontConfig.color.primaryText,
-              border: "1px solid" + fontConfig.color.primaryText,
-              borderRadius: sizeConfig.sidebarBtnBR,
-              textTransform: "none",
-              fontWeight: fontConfig.weight.bold,
-              alignSelf: "center",
-              "&:hover": {
-                bgcolor: colorConfig.secondaryBg,
-              }
-            }}
-          >
-            Edit Profile
-          </Button>
+          userIdentity?.username === props.username && <ThemeProvider theme={theme}>
+            <Button  
+              onClick={() => setModalOpen(true)}
+              className="dark"
+            >
+              Edit Profile
+            </Button>
+          </ThemeProvider>
         }
 
+        <Modal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          sx={{
+            bgcolor: colorConfig.modelBackdrop,
+          }}
+        >
+          <>
+            <EditProfile setModalOpen={setModalOpen} currentAvatar={props.currentAvatar} currentCover={props.currentCover} />
+          </>
+        </Modal>
+
         {
-          userIdentity?.username !== props.username && <Button
-            variant="contained"
-            sx={{
-              bgcolor: fontConfig.color.primaryText,
-              color: colorConfig.mainBg,
-              border: "1px solid" + fontConfig.color.primaryText,
-              borderRadius: sizeConfig.sidebarBtnBR,
-              textTransform: "none",
-              fontWeight: fontConfig.weight.bold,
-              alignSelf: "center",
-              "&:hover": {
-                bgcolor: fontConfig.color.primaryText,
-                opacity: "0.8"
-              }
-            }}
-          >
-            Follow
-          </Button>
+          userIdentity?.username !== props.username && <ThemeProvider theme={theme}>
+            <Button
+              className="light"
+            >
+              Follow
+            </Button>
+          </ThemeProvider>
         }
       </Box>
 

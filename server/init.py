@@ -11,6 +11,7 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 import redis
 from flask_wtf import CSRFProtect
+from flask_migrate import Migrate
 
 from db import db
 
@@ -39,6 +40,7 @@ def handle_preflight():
 app.before_request(handle_preflight)
 
 db.init_app(app)
+migrate = Migrate(app, db)
 
 bcrypt = Bcrypt(app)
 

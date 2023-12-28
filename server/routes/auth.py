@@ -37,8 +37,13 @@ def login():
     if form.validate_on_submit():
       user = User.query.filter_by(username=form.username.data).first()
       if user and user.check_password(attempted_password=form.password.data):
-        access_token = create_access_token(identity=user)
-        refresh_token = create_refresh_token(identity=user)
+        identity = {
+          "id": user.id,
+          "name": user.name,
+          "username": user.username,
+        }
+        access_token = create_access_token(identity=identity)
+        refresh_token = create_refresh_token(identity=identity)
         return jsonify(access_token=access_token, refresh_token=refresh_token)
       else:
         return jsonify({"msg": "Wrong username or password"}), 401

@@ -47,13 +47,14 @@ const ProfileTabs = (props: Props) => {
       }}
     >
       {
-        tabs.map((tab) => {return (
+        tabs.map((tab, index) => {return (
           <Link 
             to={"/profile/" + "luculia/" + tab.id}
             style={{
               all: "unset",
               flex: 1,
             }}
+            key={index}
           >
             <Box
               sx={{
