@@ -42,8 +42,8 @@ def get_user(username):
 @user.route('/user-identity')
 @jwt_required()
 def user_identity():
-  user = get_jwt_identity()
-  return jsonify(configDict(user))
+  user = User.query.get_or_404(get_jwt_identity()["id"])
+  return jsonify(configUser(user))
 
 @user.route('/others')
 @jwt_required()

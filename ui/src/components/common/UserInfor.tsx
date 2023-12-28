@@ -11,6 +11,8 @@ type Props = {
 }
 
 const UserInfor = ({self, userIdentity}: Props) => {
+  const defaultAvatar = 'url(https://pbs.twimg.com/profile_images/1698531056839012352/QDbb_7_3_400x400.png)'
+
   return (
     <Box
       sx={{
@@ -24,7 +26,10 @@ const UserInfor = ({self, userIdentity}: Props) => {
           height: sizeConfig.secondaryAvatar,
           width: sizeConfig.secondaryAvatar,
           borderRadius: sizeConfig.secondaryBorderRadius,
-          bgcolor: "#fff"
+          bgcolor: "#fff",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundImage: (userIdentity.avatar ? `url('data:image/png;base64,${userIdentity.avatar}')` : defaultAvatar),
         }}
       />
       <Box
