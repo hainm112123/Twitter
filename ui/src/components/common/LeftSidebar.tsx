@@ -1,4 +1,4 @@
-import { Box, Button, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Popover, Typography } from "@mui/material";
+import { Box, Button, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Modal, Paper, Popover, Typography } from "@mui/material";
 import React, { ReactNode, useState } from "react";
 import { fontConfig } from "../../configs/fontConfig";
 import { colorConfig } from "../../configs/colorConfig";
@@ -13,6 +13,7 @@ import { useCookies } from "react-cookie";
 import { logout } from "../../redux/authSlice";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import NewTweet from "../pages/HomePage/NewTweet";
 
 type Props = {}
 
@@ -27,10 +28,11 @@ items.unshift({
 })
 
 const LeftSidebar = (props: Props) => {
-  const [isUserMenuOpen, setUserMenuOpen] = useState(false);
   const dispatch = useAppDispatch();
-  const [cookies, setCookie, removeCookie] = useCookies();
   const navigate = useNavigate();
+  const [isUserMenuOpen, setUserMenuOpen] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const [modalOpen, setModalOpen] = useState(false)
   
   const token = useSelector((state: RootState) => state.auth);
   const access_token = token.access_token ?? cookies.access_token;
@@ -111,9 +113,10 @@ const LeftSidebar = (props: Props) => {
             textTransform: "none",
             width: "100%",
             "&:hover": {
-              bgcolor: colorConfig.primaryBtnBg,
+              bgcolor: colorConfig.primaryBtnBgHover,
             }
           }}
+          onClick={() => setModalOpen(true)}
         >
           <Typography
             sx={{
@@ -127,6 +130,28 @@ const LeftSidebar = (props: Props) => {
             Tweet
           </Typography>
         </Button>
+
+        <Modal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          sx={{
+            bgcolor: colorConfig.modelBackdrop,
+          }}
+        >
+          <Box sx={{
+            position: "absolute" as "absoulute",
+            left: "50%",
+            top: "50px",
+            transform: "translateX(-50%)",
+            boxShadow: 24,
+            width: "30%",
+            bgcolor: colorConfig.mainBg,
+            p: 2,
+            borderRadius: 4,
+          }}>
+            <NewTweet minRows={5} border isModal setModalOpen={setModalOpen} />
+          </Box>
+        </Modal>
       </Box>
 
       {/* user */}

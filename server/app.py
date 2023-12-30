@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from db import db
 from routes.user import user 
 from routes.auth import auth
+from routes.tweet import tweet
 from init import app
 from models import User
 from flask_wtf import csrf
@@ -24,6 +25,7 @@ def get_csrf_token():
 
 app.register_blueprint(user, url_prefix='/user')
 app.register_blueprint(auth, url_prefix='/auth')
+app.register_blueprint(tweet, url_prefix='/tweet')
 
 if __name__ == "__main__":
   app.run(debug=True, port=8000)

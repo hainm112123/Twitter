@@ -67,16 +67,9 @@ const EditProfile = (props: Props) => {
 
   return (
     <FormControl sx={{
-      bgcolor: colorConfig.mainBg,
-      position: 'absolute' as 'absolute',
+      ...styleConfig.modal,
       top: '50%',
-      left: '50%',
       transform: 'translate(-50%, -50%)',
-      minWidth: 400,
-      width: "30%",
-      border: '2px solid #000',
-      boxShadow: 24,
-      p: 2,
     }}>
       <Box sx={{
         display: "flex",
@@ -85,14 +78,7 @@ const EditProfile = (props: Props) => {
         mb: 3,
       }}>
         <Close 
-          sx={{
-            padding: "6px",
-            borderRadius: "32px",
-            "&:hover": {
-              cursor: "pointer",
-              bgcolor: colorConfig.secondaryBg,
-            }
-          }}
+          className="closeBtn--modal"
           onClick={() => props.setModalOpen(false)}
         />
         <Typography
@@ -126,6 +112,8 @@ const EditProfile = (props: Props) => {
       <ProfileCover 
         sx={{
           position: 'relative',
+          ml: -2,
+          mr: -2,
         }}
         cover={cover}
         currentCover={props.currentCover}

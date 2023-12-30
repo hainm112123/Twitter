@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey, Integer, ARRAY, LargeBinary, DateTime
+from sqlalchemy import String, ForeignKey, Integer, ARRAY, LargeBinary, DateTime, PickleType
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from db import db
 from dataclasses import dataclass
@@ -39,4 +39,20 @@ class User(db.Model):
   
   def check_password(self, attempted_password):
     return bcrypt.check_password_hash(self.hashed_password, attempted_password)
+  
+@dataclass
+class Tweet(db.Model):
+  id: Mapped[int] = mapped_column(Integer, primary_key=True)
+  author: Mapped[str] = mapped_column(String)
+  text: Mapped[str] = mapped_column(String, default="")
+  photos: Mapped[list[bytes]] = mapped_column(ARRAY(LargeBinary), default=[])
+  video: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
+  likes: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
+  retweets: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
+  replies: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
+  views: Mapped[int] = mapped_column(Integer, default=0)
+  created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+  
+  def to_dict(self):
+    return {col.name: getattr(self, col.name) for col in self.__table__.columns}
   

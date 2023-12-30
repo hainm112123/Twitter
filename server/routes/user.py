@@ -58,21 +58,21 @@ def others():
 def update_bio():
   user = User.query.get_or_404(get_jwt_identity()["id"])
   new_user_bio = request.json
-  # for key in new_user_bio:
-  #   if new_user_bio[key]:
-  #     # print(key, type(new_user_bio[key]))
-  #     # continue
-  #     if (key == 'cover' or key == 'avatar'):
-  #       setattr(user, key, base64.decodebytes(new_user_bio[key].encode('utf-8')))
-  #     else:
-  #       setattr(user, key, new_user_bio[key])
-  if (new_user_bio["name"]):
-    user.name = new_user_bio["name"]
-  if (new_user_bio["bio"]):
-    user.bio = new_user_bio["bio"]
-  if ("cover" in new_user_bio and new_user_bio["cover"]):
-    user.cover = base64.decodebytes(new_user_bio["cover"].encode('utf-8'))
-  if ("avatar" in new_user_bio and new_user_bio["avatar"]):
-    user.avatar = base64.decodebytes(new_user_bio["avatar"].encode('utf-8'))
+  for key in new_user_bio:
+    if new_user_bio[key]:
+      # print(key, type(new_user_bio[key]))
+      # continue
+      if (key == 'cover' or key == 'avatar'):
+        setattr(user, key, base64.decodebytes(new_user_bio[key].encode('utf-8')))
+      else:
+        setattr(user, key, new_user_bio[key])
+  # if (new_user_bio["name"]):
+  #   user.name = new_user_bio["name"]
+  # if (new_user_bio["bio"]):
+  #   user.bio = new_user_bio["bio"]
+  # if ("cover" in new_user_bio and new_user_bio["cover"]):
+  #   user.cover = base64.decodebytes(new_user_bio["cover"].encode('utf-8'))
+  # if ("avatar" in new_user_bio and new_user_bio["avatar"]):
+  #   user.avatar = base64.decodebytes(new_user_bio["avatar"].encode('utf-8'))
   db.session.commit()
   return {"msg": "success"}, 200

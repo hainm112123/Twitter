@@ -42,7 +42,11 @@ const RightSidebar = (props: Props) => {
         <List>
           {
             otherUsers.map((user, index) => (
-              <ListItem disablePadding key={index}>
+              <ListItem disablePadding key={index} sx={{
+                '&:hover': {
+                  bgcolor: "rgba(255,255,255,0.03)"
+                }
+              }}>
                 <Link style={{textDecoration: "none", color: "unset", flex: 1}} to={`/profile/${user.username}`}>
                   <ListItemButton>
                     <UserInfor self={false} userIdentity={user} />

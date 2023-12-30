@@ -1,5 +1,6 @@
 import { colorConfig } from "../configs/colorConfig";
 import { fontConfig } from "../configs/fontConfig";
+import { sizeConfig } from "./sizeConfig";
 
 export const styleConfig = {
   auth: {
@@ -42,6 +43,29 @@ export const styleConfig = {
     link: {
       textDecoration: "none", 
       color: fontConfig.color.interactBtn
+    }
+  },
+  modal: {
+    position: "absolute" as "absoulute",
+    left: "50%",
+    transform: "translateX(-50%)",
+    border: 2,
+    borderColor: colorConfig.mainBg,
+    boxShadow: 24,
+    minWidth: 400,
+    width: "30%",
+    bgcolor: colorConfig.mainBg,
+    p: 2,
+    borderRadius: 4,
+  },
+  avatar: {
+    height: sizeConfig.primaryAvatar,
+    width: sizeConfig.primaryAvatar,
+    borderRadius: sizeConfig.primaryBorderRadius,
+    backgroundPosition: "center",
+    backgroundSize: "cover",
+    "&:hover": {
+      opacity: "0.8"
     }
   }
 }

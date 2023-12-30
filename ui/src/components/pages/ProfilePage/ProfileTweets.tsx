@@ -8,10 +8,7 @@ type Props = {
 const ProfileTweets = (props: Props) => {
   return (
     <Box>
-      <Tweet />
-      <Tweet />
-      <Tweet />
-      <Tweet />
+      
     </Box>
   )
 }

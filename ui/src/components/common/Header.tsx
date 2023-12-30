@@ -21,8 +21,9 @@ const Header = (props: Props) => {
         top: 0,
         right: 0,
         left: 0,
+        zIndex: 10,
         bgcolor: colorConfig.bluredMainBg, 
-        backdropFilter: 'blur(3px)',
+        backdropFilter: 'blur(4px)',
         ...props.sx, 
       }}
     >

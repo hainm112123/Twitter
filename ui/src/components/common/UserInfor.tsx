@@ -4,6 +4,7 @@ import { colorConfig } from "../../configs/colorConfig"
 import { fontConfig } from "../../configs/fontConfig"
 import { UserIdentity } from "../../types/UserIdentity"
 import theme from "../styled/theme"
+import { styleConfig } from "../../configs/styleConfig"
 
 type Props = {
   self: boolean,
@@ -23,12 +24,7 @@ const UserInfor = ({self, userIdentity}: Props) => {
     >
       <Box
         sx={{
-          height: sizeConfig.secondaryAvatar,
-          width: sizeConfig.secondaryAvatar,
-          borderRadius: sizeConfig.secondaryBorderRadius,
-          bgcolor: "#fff",
-          backgroundPosition: "center",
-          backgroundSize: "cover",
+          ...styleConfig.avatar,
           backgroundImage: (userIdentity.avatar ? `url('data:image/png;base64,${userIdentity.avatar}')` : defaultAvatar),
         }}
       />

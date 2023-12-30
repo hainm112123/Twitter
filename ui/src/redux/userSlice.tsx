@@ -55,7 +55,7 @@ export const getOtherUsers = () => async (dispatch: AppDispatch) => {
 
 export const getUser = (username: any) => async (dispatch: AppDispatch) => {
   const res = await axios.get(userUrl + username);
-  console.log(res.data);
+  // console.log(res.data);
   return res.data;
 }
 

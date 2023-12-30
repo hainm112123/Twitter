@@ -41,6 +41,38 @@ const theme = createTheme({
               backgroundColor: colorConfig.secondaryBg,
             }
           }
+        },
+        {
+          props: {className: "primary"},
+          style: {
+            backgroundColor: colorConfig.primaryBtnBg,
+            color: fontConfig.color.primaryText,
+            borderRadius: sizeConfig.sidebarBtnBR,
+            textTransform: "none",
+            fontWeight: fontConfig.weight.bold,
+            alignSelf: "center",
+            "&:hover": {
+              backgroundColor: colorConfig.primaryBtnBgHover
+            }
+          }
+        }
+      ]
+    },
+
+    MuiSvgIcon: {
+      variants: [
+        {
+          props: {className: "closeBtn--modal"},
+          style: {
+            padding: "6px",
+            borderRadius: "32px",
+            color: fontConfig.color.primaryText,
+            marginLeft: "-6px",
+            "&:hover": {
+              cursor: "pointer",
+              backgroundColor: colorConfig.secondaryBg,
+            }
+          }
         }
       ]
     }

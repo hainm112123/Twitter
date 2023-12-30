@@ -9,6 +9,7 @@ import { useCookies } from 'react-cookie';
 import { RootState, useAppDispatch } from '../../redux/store';
 import { useSelector } from 'react-redux';
 import { getOtherUsers, getUserIdentity } from '../../redux/userSlice';
+import { getTweets } from '../../redux/tweetSlice';
 
 function MainLayout() {
   const [ cookies ] = useCookies();
@@ -20,12 +21,14 @@ function MainLayout() {
   const refresh_token = token.refresh_token ?? cookies.refresh_token;
 
   useEffect(() => {
+    // console.log(token.refresh_token, cookies.refresh_token)
     if (!refresh_token) {
       navigate('/auth/login')
       return;
     }
     dispatch(getUserIdentity());
     dispatch(getOtherUsers());
+    dispatch(getTweets())
   }, [navigate, access_token, refresh_token, dispatch])
 
   return (
