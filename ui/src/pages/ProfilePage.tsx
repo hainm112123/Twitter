@@ -6,8 +6,9 @@ import ProfileTabs from "../components/pages/ProfilePage/ProfileTabs";
 import ProfileTweets from "../components/pages/ProfilePage/ProfileTweets";
 import { getUser } from "../redux/userSlice";
 import { useParams } from "react-router-dom";
-import { useAppDispatch } from "../redux/store";
+import { RootState, useAppDispatch } from "../redux/store";
 import ProfileCover from "../components/pages/ProfilePage/ProfileCover";
+import { useSelector } from "react-redux";
 
 type Props = {}
 
@@ -26,6 +27,8 @@ const ProfilePage = (props: Props) => {
     bio: "",
     joined_date: null,
   });
+
+  const tweets = useSelector((state: RootState) => state.tweet.tweets).filter((tweet) => tweet.author === username);
 
   useEffect(() => {
     if (!isLoaded) {
@@ -56,8 +59,8 @@ const ProfilePage = (props: Props) => {
         bio={user.bio}
         joined_date={user.joined_date}
       />
-      <ProfileTabs />
-      <ProfileTweets />
+      <ProfileTabs username={user.username} />
+      <ProfileTweets tweets={tweets} />
     </Box>
   )
 }

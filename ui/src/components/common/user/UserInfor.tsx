@@ -1,10 +1,10 @@
 import { Box, Button, ThemeProvider } from "@mui/material"
-import { sizeConfig } from "../../configs/sizeConfig"
-import { colorConfig } from "../../configs/colorConfig"
-import { fontConfig } from "../../configs/fontConfig"
-import { UserIdentity } from "../../types/UserIdentity"
-import theme from "../styled/theme"
-import { styleConfig } from "../../configs/styleConfig"
+import { sizeConfig } from "../../../configs/sizeConfig"
+import { colorConfig } from "../../../configs/colorConfig"
+import { fontConfig } from "../../../configs/fontConfig"
+import { UserIdentity } from "../../../types/UserIdentity"
+import theme from "../../styled/theme"
+import { styleConfig } from "../../../configs/styleConfig"
 
 type Props = {
   self: boolean,

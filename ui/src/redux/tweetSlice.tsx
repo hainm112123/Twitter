@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 import Tweet from "../types/TweetType"
 import { AppDispatch } from "./store"
 import axios from "axios"
-import { newTweetUrl, tweetsUrl } from "../variables/urls"
+import { newTweetUrl, tweetUrl, tweetsUrl } from "../variables/urls"
 
 type TweetState = {
   tweets: Tweet[],
@@ -26,8 +26,13 @@ export const { setTweets } = tweetSlice.actions;
 
 export const getTweets = () => async (dispatch: AppDispatch) => {
   const res = await axios.get(tweetsUrl);
-  console.log(res.data);
+  // console.log(res.data);
   dispatch(setTweets(res.data))
+}
+
+export const getTweet = async (tweetId: number) => {
+  const res = await axios.get(tweetUrl + tweetId);
+  return res.data
 }
 
 export const newTweet = async (author: string, text: string, media?: File | null) => {

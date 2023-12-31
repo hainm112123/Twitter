@@ -1,11 +1,11 @@
 import { Box, List, Typography, ListItem, ListItemButton } from "@mui/material";
 import React from "react";
-import { colorConfig } from "../../configs/colorConfig";
-import { sizeConfig } from "../../configs/sizeConfig";
-import { fontConfig } from "../../configs/fontConfig";
-import UserInfor from "./UserInfor";
+import { colorConfig } from "../../../configs/colorConfig";
+import { sizeConfig } from "../../../configs/sizeConfig";
+import { fontConfig } from "../../../configs/fontConfig";
+import UserInfor from "../user/UserInfor";
 import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import { RootState } from "../../../redux/store";
 import { Link } from "react-router-dom";
 
 type Props = {}

@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
 import React from "react";
-import Tweet from "../components/common/Tweet";
+import Tweet from "../components/common/tweet/Tweet";
 import { colorConfig } from "../configs/colorConfig";
-import Header from "../components/common/Header";
+import Header from "../components/common/header/Header";
 import NewTweet from "../components/pages/HomePage/NewTweet";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";

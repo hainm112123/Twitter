@@ -1,5 +1,5 @@
 import { Box, SxProps } from "@mui/material"
-import { colorConfig } from "../../configs/colorConfig"
+import { colorConfig } from "../../../configs/colorConfig"
 import { ReactNode } from "react"
 
 type Props = {

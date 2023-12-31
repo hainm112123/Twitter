@@ -1,19 +1,19 @@
 import { Box, Button, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Modal, Paper, Popover, Typography } from "@mui/material";
 import React, { ReactNode, useState } from "react";
-import { fontConfig } from "../../configs/fontConfig";
-import { colorConfig } from "../../configs/colorConfig";
-import logo from "../../assets/images/logo.png"
-import appRoutes from "../../routes/appRoutes";
-import HomePage from "../../pages/HomePage";
-import { RouteType } from "../../routes/RouteType";
-import { sizeConfig } from "../../configs/sizeConfig";
-import UserInfor from "./UserInfor";
-import { RootState, useAppDispatch } from "../../redux/store";
+import { fontConfig } from "../../../configs/fontConfig";
+import { colorConfig } from "../../../configs/colorConfig";
+import logo from "../../../assets/images/logo.png"
+import appRoutes from "../../../routes/appRoutes";
+import HomePage from "../../../pages/HomePage";
+import { RouteType } from "../../../routes/RouteType";
+import { sizeConfig } from "../../../configs/sizeConfig";
+import UserInfor from "../user/UserInfor";
+import { RootState, useAppDispatch } from "../../../redux/store";
 import { useCookies } from "react-cookie";
-import { logout } from "../../redux/authSlice";
+import { logout } from "../../../redux/authSlice";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import NewTweet from "../pages/HomePage/NewTweet";
+import NewTweet from "../../pages/HomePage/NewTweet";
 
 type Props = {}
 

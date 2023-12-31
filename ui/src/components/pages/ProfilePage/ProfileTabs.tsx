@@ -5,7 +5,7 @@ import { fontConfig } from "../../../configs/fontConfig"
 import { Link } from "react-router-dom"
 
 type Props = {
-
+  username: string,
 }
 
 type Tab = {
@@ -49,7 +49,7 @@ const ProfileTabs = (props: Props) => {
       {
         tabs.map((tab, index) => {return (
           <Link 
-            to={"/profile/" + "luculia/" + tab.id}
+            to={"/profile/" + props.username + "/" + tab.id}
             style={{
               all: "unset",
               flex: 1,

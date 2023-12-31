@@ -67,5 +67,13 @@ export const styleConfig = {
     "&:hover": {
       opacity: "0.8"
     }
+  },
+  HeaderText: {
+    flex: 1,
+    textAlign: "left",
+    ml: 1,
+    lineHeight: "1.0",
+    fontSize: fontConfig.size.subHeader,
+    fontWeight: fontConfig.weight.subHeader,
   }
 }

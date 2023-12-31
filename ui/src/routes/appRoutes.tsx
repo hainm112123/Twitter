@@ -97,7 +97,7 @@ const appRoutes: RouteType[] = [
   {
     element: <TweetPage/>,
     state: "tweet",
-    path: "/:user/tweet/:tweetId"
+    path: "/:username/tweet/:id"
   }
 ]
 
