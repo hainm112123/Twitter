@@ -18,14 +18,11 @@ export const tweetSlice = createSlice({
   reducers: {
     setTweets(state, action) {
       state.tweets = action.payload
-    },
-    modifyTweets(state, action) {
-      state.tweets[action.payload.index] = action.payload.tweet
     }
   }
 })
 
-export const { setTweets, modifyTweets } = tweetSlice.actions;
+export const { setTweets } = tweetSlice.actions;
 
 export const getTweets = () => async (dispatch: AppDispatch) => {
   const res = await axios.get(tweetsUrl);
@@ -62,7 +59,6 @@ export const toggleLikeTweet = (tweetId: number, username: any) => async (dispat
     username
   });
   const tweet = await getTweet(tweetId);
-  dispatch(modifyTweets({index: tweetId, tweet}));
 }
 
 export const tweetSliceReducer = tweetSlice.reducer;

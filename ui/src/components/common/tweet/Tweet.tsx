@@ -48,6 +48,7 @@ const Tweet = (props: {tweetId: number, detail?: boolean} | any) => {
       return;
     }
     const fn = async () => {
+      // console.log(props.tweetId);
       const tweetData = await getTweet(props.tweetId);
       setTweet(tweetData);
       const userData = await dispatch(getUser(tweetData.author));
@@ -68,7 +69,7 @@ const Tweet = (props: {tweetId: number, detail?: boolean} | any) => {
   const Author = <TweetAuthor username={user.username} name={user.name} created_at={tweet.created_at} detail={props.detail} />
   const Text = <TweetText text={tweet.text} />
   const Media = <TweetMedia {...tweet} />
-  const Interact = <TweetInteract {...tweet} />
+  const Interact = <TweetInteract {...tweet} setTweet={setTweet} />
 
   return (
     <Box

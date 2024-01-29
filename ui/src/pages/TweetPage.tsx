@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import Tweet from "../components/common/tweet/Tweet";
+import Loader from "../components/common/Loader";
 
 type Props = {}
 
@@ -14,6 +15,12 @@ const TweetPage = (props: Props) => {
   const params = useParams();
   const tweets = useSelector((state: RootState) => state.tweet.tweets)
   const tweet = tweets && tweets[tweets.findIndex((tweet) => tweet === Number(params.id))];
+  
+  if (!tweet) {
+    return (
+      <Loader />
+    )
+  }
 
   return (
     <Box>

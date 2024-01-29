@@ -1,13 +1,13 @@
 import { Box, SvgIconTypeMap } from "@mui/material"
 import { fontConfig } from "../../../configs/fontConfig"
 import { OverridableComponent } from "@mui/material/OverridableComponent"
-import { useState } from "react"
+import { SetStateAction, useState } from "react"
 import { sizeConfig } from "../../../configs/sizeConfig"
 import { colorConfig } from "../../../configs/colorConfig"
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { BookmarkBorder, EqualizerOutlined, FavoriteBorder, FileUploadOutlined, RepeatOutlined, Favorite, ChatBubble, Bookmark } from "@mui/icons-material";
 import { RootState, useAppDispatch } from "../../../redux/store"
-import { toggleLikeTweet } from "../../../redux/tweetSlice"
+import { getTweet, toggleLikeTweet } from "../../../redux/tweetSlice"
 import { useSelector } from "react-redux"
 
 type InterractButton = {
@@ -73,6 +73,7 @@ type Props = {
   retweets: string[],
   replies: number[],
   views: number,
+  setTweet: any,
 } 
 
 const TweetInteract = (props: Props) => {
@@ -121,7 +122,12 @@ const TweetInteract = (props: Props) => {
         ActiveIcon={Favorite}
         onClick={(e) => {
           e.preventDefault();
-          dispatch(toggleLikeTweet(props.id, userIdentity?.username))
+          const fn = async () => {
+            await dispatch(toggleLikeTweet(props.id, userIdentity?.username));
+            const tweetData = await getTweet(props.id)
+            props.setTweet(tweetData);
+          }
+          fn();
         }}
         active={props.likes.findIndex((temp) => temp === userIdentity?.username) !== -1}
       />
