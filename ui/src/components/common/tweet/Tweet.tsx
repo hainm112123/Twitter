@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import { colorConfig } from "../../../configs/colorConfig";
@@ -13,8 +13,10 @@ import TweetMedia from "./TweetMedia";
 import TweetInteract from "./TweetInteract";
 import moment from "moment";
 import { fontConfig } from "../../../configs/fontConfig";
+import Loader from "../Loader";
+import { getTweet } from "../../../redux/tweetSlice";
 
-const Tweet = (props: TweetType & {detail?: boolean}) => {
+const Tweet = (props: {tweetId: number, detail?: boolean} | any) => {
   const dispatch = useAppDispatch();
   const [isLoaded, setLoaded] = useState(false);
   const [user, setUser] = useState({
@@ -28,6 +30,17 @@ const Tweet = (props: TweetType & {detail?: boolean}) => {
     bio: "",
     joined_date: null,
   });
+  const [tweet, setTweet] = useState({
+    id: -1,
+    author: null,
+    text: "",
+    photos: [],
+    likes: [],
+    retweets: [],
+    replies: [],
+    views: 0,
+    created_at: null,
+  })
 
   useEffect(() => {
     if (!isLoaded) {
@@ -35,19 +48,27 @@ const Tweet = (props: TweetType & {detail?: boolean}) => {
       return;
     }
     const fn = async () => {
-      const data = await dispatch(getUser(props.author));
-      setUser(data);
+      const tweetData = await getTweet(props.tweetId);
+      setTweet(tweetData);
+      const userData = await dispatch(getUser(tweetData.author));
+      setUser(userData);
     }
     fn();
      
-  }, [isLoaded, dispatch])
+  }, [isLoaded, dispatch, props])
+
+  if (!tweet.author) {
+    return (
+      <Loader />
+    )
+  }
 
 
   const Avatar = <TweetAvatar username={user.username} avatar={user.avatar} />
-  const Author = <TweetAuthor username={user.username} name={user.name} created_at={props.created_at} detail={props.detail} />
-  const Text = <TweetText text={props.text} />
-  const Media = <TweetMedia {...props} />
-  const Interact = <TweetInteract {...props} />
+  const Author = <TweetAuthor username={user.username} name={user.name} created_at={tweet.created_at} detail={props.detail} />
+  const Text = <TweetText text={tweet.text} />
+  const Media = <TweetMedia {...tweet} />
+  const Interact = <TweetInteract {...tweet} />
 
   return (
     <Box
@@ -61,7 +82,7 @@ const Tweet = (props: TweetType & {detail?: boolean}) => {
         }
       }}
     >
-      <Link to={`/${user.username}/tweet/${props.id}`} style={{all: "unset"}}>
+      <Link to={`/${user.username}/tweet/${tweet.id}`} style={{all: "unset"}}>
         {/* Note */}
         {/* <Box
           sx={{
@@ -128,7 +149,7 @@ const Tweet = (props: TweetType & {detail?: boolean}) => {
               borderBottom: 1,
               borderColor: colorConfig.border,
             }}>
-              {moment(props.created_at).format('h:mm A')} &#183; {moment(props.created_at).format('MMM DD, YYYY')}
+              {moment(tweet.created_at).format('h:mm A')} &#183; {moment(tweet.created_at).format('MMM DD, YYYY')}
             </Box>
 
             {Interact}

@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 import { RootState, useAppDispatch } from "../redux/store";
 import ProfileCover from "../components/pages/ProfilePage/ProfileCover";
 import { useSelector } from "react-redux";
+import { getTweetsByAuthor } from "../redux/tweetSlice";
 
 type Props = {}
 
@@ -27,8 +28,7 @@ const ProfilePage = (props: Props) => {
     bio: "",
     joined_date: null,
   });
-
-  const tweets = useSelector((state: RootState) => state.tweet.tweets).filter((tweet) => tweet.author === username);
+  const [tweets, setTweets] = useState([])
 
   useEffect(() => {
     if (!isLoaded) {
@@ -38,6 +38,7 @@ const ProfilePage = (props: Props) => {
     const fn = async () => {
       const data = await dispatch(getUser(username));
       setUser(data);
+      setTweets(await getTweetsByAuthor(username))
     }
     fn();
   }, [isLoaded, dispatch, username])

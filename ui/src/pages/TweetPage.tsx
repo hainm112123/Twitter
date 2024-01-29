@@ -13,7 +13,7 @@ type Props = {}
 const TweetPage = (props: Props) => {
   const params = useParams();
   const tweets = useSelector((state: RootState) => state.tweet.tweets)
-  const tweet = tweets[tweets.findIndex((tweet) => tweet.id === Number(params.id))]
+  const tweet = tweets && tweets[tweets.findIndex((tweet) => tweet === Number(params.id))];
 
   return (
     <Box>
@@ -22,7 +22,7 @@ const TweetPage = (props: Props) => {
           Tweet
         </Box>
       </HeaderWithBack>
-      <Tweet {...tweet} detail />
+      <Tweet tweetId={tweet} detail />
     </Box>
   )
 }

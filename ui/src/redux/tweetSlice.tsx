@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit"
-import Tweet from "../types/TweetType"
+import TweetType from "../types/TweetType"
 import { AppDispatch } from "./store"
 import axios from "axios"
-import { newTweetUrl, tweetUrl, tweetsUrl } from "../variables/urls"
+import { newTweetUrl, toggleLikeTweetUrl, tweetUrl, tweetsByAuthorUrl, tweetsUrl } from "../variables/urls"
 
 type TweetState = {
-  tweets: Tweet[],
+  tweets: number[],
 }
 
 const initialState: TweetState = {
@@ -18,16 +18,24 @@ export const tweetSlice = createSlice({
   reducers: {
     setTweets(state, action) {
       state.tweets = action.payload
+    },
+    modifyTweets(state, action) {
+      state.tweets[action.payload.index] = action.payload.tweet
     }
   }
 })
 
-export const { setTweets } = tweetSlice.actions;
+export const { setTweets, modifyTweets } = tweetSlice.actions;
 
 export const getTweets = () => async (dispatch: AppDispatch) => {
   const res = await axios.get(tweetsUrl);
   // console.log(res.data);
   dispatch(setTweets(res.data))
+}
+
+export const getTweetsByAuthor = async (author: any) => {
+  const res = await axios.get(tweetsByAuthorUrl + author);
+  return res.data;
 }
 
 export const getTweet = async (tweetId: number) => {
@@ -46,6 +54,15 @@ export const newTweet = async (author: string, text: string, media?: File | null
     photos,
     video,
   })
+}
+
+export const toggleLikeTweet = (tweetId: number, username: any) => async (dispatch: AppDispatch) => {
+  await axios.post(toggleLikeTweetUrl, {
+    tweet_id: tweetId,
+    username
+  });
+  const tweet = await getTweet(tweetId);
+  dispatch(modifyTweets({index: tweetId, tweet}));
 }
 
 export const tweetSliceReducer = tweetSlice.reducer;

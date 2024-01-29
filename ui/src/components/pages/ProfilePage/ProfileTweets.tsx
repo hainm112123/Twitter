@@ -1,9 +1,8 @@
 import { Box } from "@mui/material"
 import Tweet from "../../common/tweet/Tweet"
-import TweetType from "../../../types/TweetType"
 
 type Props = {
-  tweets: TweetType[],
+  tweets: number[],
 }
 
 const ProfileTweets = ({ tweets }: Props) => {
@@ -11,7 +10,7 @@ const ProfileTweets = ({ tweets }: Props) => {
     <Box>
       {
         tweets.map((tweet, index) => (
-          <Tweet {...tweet} key={index} />
+          <Tweet tweetId={tweet} key={index} />
         ))
       }
     </Box>

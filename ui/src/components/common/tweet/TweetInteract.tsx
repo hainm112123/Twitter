@@ -5,17 +5,24 @@ import { useState } from "react"
 import { sizeConfig } from "../../../configs/sizeConfig"
 import { colorConfig } from "../../../configs/colorConfig"
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import { BookmarkBorder, EqualizerOutlined, FavoriteBorder, FileUploadOutlined, RepeatOutlined } from "@mui/icons-material";
+import { BookmarkBorder, EqualizerOutlined, FavoriteBorder, FileUploadOutlined, RepeatOutlined, Favorite, ChatBubble, Bookmark } from "@mui/icons-material";
+import { RootState, useAppDispatch } from "../../../redux/store"
+import { toggleLikeTweet } from "../../../redux/tweetSlice"
+import { useSelector } from "react-redux"
 
 type InterractButton = {
   count?: number,
   color: string,
   bgcolor: string,
-  onClick?: any,
-  Icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>>
+  onClick?: React.MouseEventHandler<HTMLDivElement>,
+  Icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>>,
+  ActiveIcon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>>,
+  active: boolean,
 }
 const InteractButton = (props: InterractButton) => {
   const [isHover, setHover] = useState(false);
+
+  const Icon = props.active ? props.ActiveIcon : props.Icon
 
   return (
     <Box 
@@ -25,8 +32,9 @@ const InteractButton = (props: InterractButton) => {
       }}
       onMouseOver={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onClick={props.onClick}
     >
-      <props.Icon sx={[
+      <Icon sx={[
         {
           fontSize: fontConfig.size.secondaryIcon,
           borderRadius: sizeConfig.interactBtnBR,
@@ -34,17 +42,19 @@ const InteractButton = (props: InterractButton) => {
           display: "flex",
           alignItems: "center",
         },
-        isHover && {
+        (isHover || props.active) && {
           color: props.color,
-          bgcolor: props.bgcolor,
           transition: colorConfig.btnTransition,
+        },
+        isHover && {
+          bgcolor: props.bgcolor,
         }
       ]} />
       {
         props.count !== undefined && <Box 
           sx={[
             {lineHeight: "1.0"},
-            isHover && {
+            (isHover || props.active) && {
               color: props.color,
               transition: colorConfig.btnTransition,
             }
@@ -58,13 +68,17 @@ const InteractButton = (props: InterractButton) => {
 }
 
 type Props = {
-  likes: number[],
-  retweets: number[],
+  id: number,
+  likes: string[],
+  retweets: string[],
   replies: number[],
   views: number,
 } 
 
 const TweetInteract = (props: Props) => {
+  const dispatch = useAppDispatch();
+  const userIdentity = useSelector((state: RootState) => state.user.userIdentity);
+
   return (
     <Box
       sx={{
@@ -80,6 +94,11 @@ const TweetInteract = (props: Props) => {
         bgcolor={colorConfig.interactBtnBg} 
         count={props.replies.length} 
         Icon={ChatBubbleOutlineIcon}
+        ActiveIcon={ChatBubble}
+        onClick={(e) => {
+          e.preventDefault();
+        }}
+        active={false}
       />
 
       <InteractButton 
@@ -87,6 +106,11 @@ const TweetInteract = (props: Props) => {
         bgcolor={colorConfig.retweetBtnBg} 
         count={props.retweets.length} 
         Icon={RepeatOutlined}
+        ActiveIcon={RepeatOutlined}
+        onClick={(e) => {
+          e.preventDefault();
+        }}
+        active={false}
       />
       
       <InteractButton 
@@ -94,6 +118,12 @@ const TweetInteract = (props: Props) => {
         bgcolor={colorConfig.likeBtnBg} 
         count={props.likes.length} 
         Icon={FavoriteBorder}
+        ActiveIcon={Favorite}
+        onClick={(e) => {
+          e.preventDefault();
+          dispatch(toggleLikeTweet(props.id, userIdentity?.username))
+        }}
+        active={props.likes.findIndex((temp) => temp === userIdentity?.username) !== -1}
       />
 
       <InteractButton 
@@ -101,6 +131,11 @@ const TweetInteract = (props: Props) => {
         bgcolor={colorConfig.interactBtnBg} 
         count={props.replies.length} 
         Icon={EqualizerOutlined}
+        ActiveIcon={EqualizerOutlined}
+        onClick={(e) => {
+          e.preventDefault();
+        }}
+        active={false}
       />
       
       <Box
@@ -112,11 +147,21 @@ const TweetInteract = (props: Props) => {
           color={fontConfig.color.interactBtn} 
           bgcolor={colorConfig.interactBtnBg}
           Icon={BookmarkBorder}
+          ActiveIcon={Bookmark}
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+          active={false}
         />
         <InteractButton 
           color={fontConfig.color.interactBtn} 
           bgcolor={colorConfig.interactBtnBg}
           Icon={FileUploadOutlined}
+          ActiveIcon={FileUploadOutlined}
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+          active={false}
         />
       </Box>
     </Box>

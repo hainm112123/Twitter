@@ -2,8 +2,8 @@ export type UserIdentity = {
   id: number,
   name: string,
   username: string,
-  followers: number[]
-  following: number[],
+  followers: string[]
+  following: string[],
   avatar: string,
 }
 
