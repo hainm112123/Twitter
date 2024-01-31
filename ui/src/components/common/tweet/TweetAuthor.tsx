@@ -31,6 +31,7 @@ const TweetAuthor = (props: Props) => {
           <Box
             sx={{
               fontWeight: fontConfig.weight.author,
+              color: fontConfig.color.primaryText,
               "&:hover": {
                 textDecoration: "underline",
                 cursor: "pointer"

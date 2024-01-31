@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 import TweetType from "../types/TweetType"
 import { AppDispatch } from "./store"
 import axios from "axios"
-import { newTweetUrl, toggleLikeTweetUrl, tweetUrl, tweetsByAuthorUrl, tweetsUrl } from "../variables/urls"
+import { authorUrl, newTweetUrl, parentTweetUrl, repliesUrl, toggleLikeTweetUrl, tweetUrl, tweetsByAuthorUrl, tweetsUrl } from "../variables/urls"
 
 type TweetState = {
   tweets: number[],
@@ -30,6 +30,11 @@ export const getTweets = () => async (dispatch: AppDispatch) => {
   dispatch(setTweets(res.data))
 }
 
+export const getReplies = async (tweetId: number) => {
+  const res = await axios.get(repliesUrl + tweetId);
+  return res.data;
+} 
+
 export const getTweetsByAuthor = async (author: any) => {
   const res = await axios.get(tweetsByAuthorUrl + author);
   return res.data;
@@ -37,10 +42,20 @@ export const getTweetsByAuthor = async (author: any) => {
 
 export const getTweet = async (tweetId: number) => {
   const res = await axios.get(tweetUrl + tweetId);
-  return res.data
+  return res.data;
 }
 
-export const newTweet = async (author: string, text: string, media?: File | null) => {
+export const getParentTweet = async (tweetId: number) => {
+  const res = await axios.get(parentTweetUrl + tweetId);
+  return res.data ? Number(res.data) : null;
+}
+
+export const getAuthor = async (tweetId: number) => {
+  const res = await axios.get(authorUrl + tweetId);
+  return res.data;
+}
+
+export const newTweet = async (author: string, text: string, media?: File | null, is_reply_of?: number) => {
   const mediaType = media?.type.split('/')[0];
   const b64Media = media && Buffer.from(new Uint8Array(await media.arrayBuffer())).toString('base64');
   const photos = mediaType === 'image' ? [b64Media] : [];
@@ -50,6 +65,7 @@ export const newTweet = async (author: string, text: string, media?: File | null
     text,
     photos,
     video,
+    is_reply_of: is_reply_of ?? null,
   })
 }
 

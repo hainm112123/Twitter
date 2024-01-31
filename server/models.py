@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey, Integer, ARRAY, LargeBinary, DateTime, PickleType
+from sqlalchemy import String, ForeignKey, Integer, ARRAY, LargeBinary, DateTime, PickleType, Boolean
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from db import db
 from dataclasses import dataclass
@@ -52,6 +52,7 @@ class Tweet(db.Model):
   replies: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=[])
   views: Mapped[int] = mapped_column(Integer, default=0)
   created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+  is_reply_of: Mapped[int] = mapped_column(Integer, nullable=True)
   
   def to_dict(self):
     return {col.name: getattr(self, col.name) for col in self.__table__.columns}

@@ -17,7 +17,10 @@ type Props = {
   minRows?: number,
   border?: boolean,
   isModal?: boolean,
+  isReplyOf?: number,
   setModalOpen?: Dispatch<SetStateAction<boolean>>,
+  BriefTweet?: JSX.Element,
+  success: Function
 }
 
 type AttachProps = {
@@ -97,6 +100,11 @@ const NewTweet = (props: Props) => {
           </Box>
         )
       }
+
+      {
+        props.BriefTweet
+      }
+
       <Box sx={{
         display: "flex",
       }}>
@@ -107,7 +115,7 @@ const NewTweet = (props: Props) => {
           }}
         />
         <TextField 
-          placeholder="What is happening?!" 
+          placeholder={props.isReplyOf ? "Tweet your reply" : "What is happening?!"}
           fullWidth
           multiline
           minRows={props.minRows ?? 1}
@@ -169,10 +177,15 @@ const NewTweet = (props: Props) => {
         </Box>
 
         <Button className="primary" onClick={() => {
-          newTweet(user.username, text, media).then(() => {
-            window.location.reload();
+          newTweet(user.username, text, media, props.isReplyOf).then(() => {
+            setText("");
+            setMedia(null);
+            if (props.isModal && props.setModalOpen) props.setModalOpen(false);
+            props.success();
           });
-        }}> Tweet </Button>
+        }}> 
+          {props.isReplyOf ? 'Reply' : 'Tweet'} 
+        </Button>
       </Box>
     </Box>
   )

@@ -13,7 +13,9 @@ import { useCookies } from "react-cookie";
 import { logout } from "../../../redux/authSlice";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import NewTweet from "../../pages/HomePage/NewTweet";
+import NewTweet from "../tweet/NewTweet";
+import NewTweetModal from "../tweet/NewTweetModal";
+import { getTweets } from "../../../redux/tweetSlice";
 
 type Props = {}
 
@@ -131,27 +133,11 @@ const LeftSidebar = (props: Props) => {
           </Typography>
         </Button>
 
-        <Modal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          sx={{
-            bgcolor: colorConfig.modelBackdrop,
-          }}
-        >
-          <Box sx={{
-            position: "absolute" as "absoulute",
-            left: "50%",
-            top: "50px",
-            transform: "translateX(-50%)",
-            boxShadow: 24,
-            width: "30%",
-            bgcolor: colorConfig.mainBg,
-            p: 2,
-            borderRadius: 4,
-          }}>
-            <NewTweet minRows={5} border isModal setModalOpen={setModalOpen} />
-          </Box>
-        </Modal>
+        <NewTweetModal 
+          modalOpen={modalOpen} 
+          setModalOpen={setModalOpen} 
+          success={() => dispatch(getTweets())} 
+        />
       </Box>
 
       {/* user */}

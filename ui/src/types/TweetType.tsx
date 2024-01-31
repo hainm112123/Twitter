@@ -9,6 +9,7 @@ type TweetType = {
   replies: number[],
   views: number,
   created_at: string,
+  is_reply_of: number | null
 }
 
 export default TweetType

@@ -3,11 +3,12 @@ import React, { useState } from "react";
 import Tweet from "../components/common/tweet/Tweet";
 import { colorConfig } from "../configs/colorConfig";
 import Header from "../components/common/header/Header";
-import NewTweet from "../components/pages/HomePage/NewTweet";
+import NewTweet from "../components/common/tweet/NewTweet";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
+import { RootState, useAppDispatch } from "../redux/store";
 import Loader from "../components/common/Loader";
 import { fontConfig } from "../configs/fontConfig";
+import { getTweets } from "../redux/tweetSlice";
 
 type Props = {}
 
@@ -59,6 +60,8 @@ const Tab = (props: TabProps) => {
 }
 
 const HomePage = (props: Props) => {
+  const dispatch = useAppDispatch();
+
   const FORYOU = 'for-you', FOLLOWING = 'following';
   let tweets = useSelector((state: RootState) => state.tweet.tweets);
   const userIdentity = useSelector((state: RootState) => state.user.userIdentity);
@@ -89,7 +92,7 @@ const HomePage = (props: Props) => {
           p: 2,
         }}
       >
-        <NewTweet />
+        <NewTweet success={() => dispatch(getTweets())} />
       </Box>
 
       {/* tweets */}

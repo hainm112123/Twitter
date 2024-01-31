@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import { colorConfig } from "../../../configs/colorConfig";
@@ -14,9 +14,17 @@ import TweetInteract from "./TweetInteract";
 import moment from "moment";
 import { fontConfig } from "../../../configs/fontConfig";
 import Loader from "../Loader";
-import { getTweet } from "../../../redux/tweetSlice";
+import { getReplies, getTweet } from "../../../redux/tweetSlice";
 
-const Tweet = (props: {tweetId: number, detail?: boolean} | any) => {
+type Props = {
+  tweetId: number, 
+  detail?: boolean, 
+  isReply: boolean, 
+  isParent: boolean,
+  replySuccess?: Function,
+}
+
+const Tweet = (props: Props | any) => {
   const dispatch = useAppDispatch();
   const [isLoaded, setLoaded] = useState(false);
   const [user, setUser] = useState({
@@ -40,7 +48,8 @@ const Tweet = (props: {tweetId: number, detail?: boolean} | any) => {
     replies: [],
     views: 0,
     created_at: null,
-  })
+    is_reply_of: null,
+  });
 
   useEffect(() => {
     if (!isLoaded) {
@@ -64,100 +73,140 @@ const Tweet = (props: {tweetId: number, detail?: boolean} | any) => {
     )
   }
 
-
-  const Avatar = <TweetAvatar username={user.username} avatar={user.avatar} />
-  const Author = <TweetAuthor username={user.username} name={user.name} created_at={tweet.created_at} detail={props.detail} />
-  const Text = <TweetText text={tweet.text} />
-  const Media = <TweetMedia {...tweet} />
-  const Interact = <TweetInteract {...tweet} setTweet={setTweet} />
-
-  return (
+  const BriefTweet = (
     <Box
       sx={{
-        border: 1,
-        borderTop: 0,
-        borderColor: colorConfig.border,
-        padding: "12px",
-        "&:hover": {
-          cursor: "pointer"
-        }
+        display: "flex",
+        mb: 1,
       }}
     >
-      <Link to={`/${user.username}/tweet/${tweet.id}`} style={{all: "unset"}}>
-        {/* Note */}
-        {/* <Box
-          sx={{
-            display: "flex",
-            color: fontConfig.color.secondaryText,
-            paddingBottom: "8px"
-          }}
-        >
-          <RepeatOutlined
-            sx={{
-              fontSize: fontConfig.size.secondaryIcon,
-              paddingLeft: "20px",
-              paddingRight: "8px",
-              fontWeight: fontConfig.weight.bold,
-            }}
-          />
-          <Typography
-            sx={{
-              fontSize: fontConfig.size.secondaryText,
-              fontWeight: fontConfig.weight.bold,
-            }}
-          >
-            Yuuhi reposted
-          </Typography>
-        </Box> */}
+      <TweetAvatar username={user.username} avatar={user.avatar} onReply />
+      <Box
+        sx={{
+          flex: 1,
+        }}
+      >
+        <TweetAuthor username={user.username} name={user.name} created_at={tweet.created_at} detail={false} />
+        <TweetText text={tweet.text} detail={false} />
+        <Typography sx={{
+          color: fontConfig.color.secondaryText,
+          fontSize: fontConfig.size.secondaryText,
+        }}>
+          Relying to @{user.username}
+        </Typography>
+      </Box>
+    </Box>
+  )
 
-        {/* Main */}
-        {
-          !props.detail &&  <Box
+  const Avatar = <TweetAvatar username={user.username} avatar={user.avatar} onReply={props.isParent} />
+  const Author = <TweetAuthor username={user.username} name={user.name} created_at={tweet.created_at} detail={props.detail} />
+  const Text = <TweetText text={tweet.text} detail={props.detail} />
+  const Media = <TweetMedia {...tweet} />
+  const Interact = <TweetInteract 
+    {...tweet} 
+    setTweet={setTweet} 
+    BriefTweet={BriefTweet} 
+    detail={props.detail} 
+    replySuccess={async () => {
+      const tweetData = await getTweet(props.tweetId);
+      setTweet(tweetData);
+      props.replySuccess && props.replySuccess();
+    }} 
+  />
+
+  return (
+    <Box>
+      {
+        (tweet.is_reply_of && !props.isReply) && <Tweet tweetId={tweet.is_reply_of} isParent />
+      }
+      <Box
+        sx={{
+          border: 1,
+          borderTop: 0,
+          borderBottom: (props.detail || props.isParent) ? 0 : 1,
+          borderColor: colorConfig.border,
+          padding: "12px",
+          pb: props.isParent ? 0 : "12px",
+          "&:hover": {
+            cursor: "pointer"
+          }
+        }}
+      >
+        <Link to={`/${user.username}/tweet/${tweet.id}`} style={{all: "unset"}}>
+          {/* Note */}
+          {/* <Box
             sx={{
               display: "flex",
+              color: fontConfig.color.secondaryText,
+              paddingBottom: "8px"
             }}
           >
-            {Avatar}
-            <Box
+            <RepeatOutlined
               sx={{
-                flex: 1,
+                fontSize: fontConfig.size.secondaryIcon,
+                paddingLeft: "20px",
+                paddingRight: "8px",
+                fontWeight: fontConfig.weight.bold,
+              }}
+            />
+            <Typography
+              sx={{
+                fontSize: fontConfig.size.secondaryText,
+                fontWeight: fontConfig.weight.bold,
               }}
             >
-              {Author}
+              Yuuhi reposted
+            </Typography>
+          </Box> */}
+
+          {/* Main */}
+          {
+            !props.detail &&  <Box
+              sx={{
+                display: "flex",
+              }}
+            >
+              {Avatar}
+              <Box
+                sx={{
+                  flex: 1,
+                }}
+              >
+                {Author}
+                {Text}
+                {Media}
+                {Interact}
+              </Box>
+            </Box>
+          }
+
+          {
+            props.detail && <Box>
+              <Box sx={{
+                display: "flex",
+                mb: 1,
+              }}>
+                {Avatar}
+                {Author}
+              </Box>
               {Text}
               {Media}
+              
+              <Box sx={{
+                mt: 1,
+                pb: 2,
+                color: fontConfig.color.secondaryText,
+                fontSize: fontConfig.size.text_2,
+              }}>
+                {moment(tweet.created_at).format('h:mm A')} &#183; {moment(tweet.created_at).format('MMM DD, YYYY')}
+              </Box>
+
               {Interact}
-            </Box>
-          </Box>
-        }
-
-        {
-          props.detail && <Box>
-            <Box sx={{
-              display: "flex",
-            }}>
-              {Avatar}
-              {Author}
-            </Box>
-            {Text}
-            {Media}
-            
-            <Box sx={{
-              mt: 1,
-              pb: 2,
-              color: fontConfig.color.secondaryText,
-              fontSize: fontConfig.size.text_2,
-              borderBottom: 1,
-              borderColor: colorConfig.border,
-            }}>
-              {moment(tweet.created_at).format('h:mm A')} &#183; {moment(tweet.created_at).format('MMM DD, YYYY')}
-            </Box>
-
-            {Interact}
-          </Box>  
-        }
-       
-      </Link>
+            </Box>  
+          }
+        
+        </Link>
+      </Box>
     </Box>
   )
 }

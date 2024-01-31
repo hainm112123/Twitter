@@ -28,19 +28,34 @@ def encodeTweet(tweet):
 
 @tweet.route('/all')
 def get_all_tweet(): 
-  tweets = db.session.execute(db.select(Tweet.id).order_by(desc(Tweet.created_at))).scalars()
+  tweets = db.session.execute(db.select(Tweet.id).order_by(desc(Tweet.created_at)).where(Tweet.is_reply_of == None)).scalars()
   return jsonify(list(tweets))
   # return jsonify(list(map(configTweet, tweets)))
 
+@tweet.route('/replies/<int:tweet_id>')
+def get_replies(tweet_id):
+  replies = db.session.execute(db.select(Tweet.id).order_by(desc(Tweet.created_at)).where(Tweet.is_reply_of == tweet_id)).scalars()
+  return jsonify(list(replies))
+
 @tweet.route('/get-by-author/<string:author>')
 def get_by_author(author):
-  tweets = db.session.execute(db.select(Tweet.id).order_by(desc(Tweet.created_at)).where(Tweet.author == author)).scalars()
+  tweets = db.session.execute(db.select(Tweet.id).order_by(desc(Tweet.created_at)).where((Tweet.author == author) & (Tweet.is_reply_of  == None))).scalars()
   return jsonify(list(tweets))
 
 @tweet.route('/get/<int:id>')
 def get_tweet(id):
   tweet = Tweet.query.get_or_404(id)
   return jsonify(configTweet(tweet))
+
+@tweet.route('/get-parent-tweet/<int:id>')
+def get_parent_tweet(id):
+  tweet = db.session.execute(db.select(Tweet.is_reply_of).where(Tweet.id == id)).scalar()
+  return jsonify(tweet)
+
+@tweet.route('/get-author/<int:id>')
+def get_author(id):
+  author = db.session.execute(db.select(Tweet.author).where(Tweet.id == id)).scalar()
+  return jsonify(author)
 
 @tweet.route('/create', methods=['POST'])
 @jwt_required()
@@ -57,6 +72,12 @@ def create_tweet():
   # new_tweet = Tweet(**tweet)
   new_tweet = encodeTweet(tweet)
   db.session.add(new_tweet)
+  if new_tweet.is_reply_of:
+    parent = Tweet.query.get_or_404(new_tweet.is_reply_of)
+    replies = copy.deepcopy(parent.replies)
+    replies.append(new_tweet.id)
+    parent.replies = replies
+
   db.session.commit()
   return {"msg": "success"}, 200
 
