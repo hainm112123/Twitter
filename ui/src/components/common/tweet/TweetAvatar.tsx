@@ -20,7 +20,8 @@ const TweetAvatar = (props: Props) => {
         <Box
           sx={{
             ...styleConfig.avatar,
-            backgroundImage: (props.avatar ? `url('data:image/png;base64,${props.avatar}')` : defaultAvatar),
+            // backgroundImage: (props.avatar ? `url('data:image/png;base64,${props.avatar}')` : defaultAvatar),
+            backgroundImage: (props.avatar ? `url(${props.avatar})` : defaultAvatar),
           }}
         />
       </Link>

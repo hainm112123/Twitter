@@ -35,13 +35,15 @@ const TweetMedia = (props: Props) => {
           overflow: "hidden",
         }}
       >
-        {props.photos.length > 0 && <img src={`data:image/png;base64,${props.photos[0]}`} style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}}/>}
+        {/* {props.photos.length > 0 && <img src={`data:image/png;base64,${props.photos[0]}`} style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}}/>} */}
+        {props.photos.length > 0 && <img src={props.photos[0]} style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}}/>}
         <InView as="div" onChange={(inView) => {
           setVisible(inView);
           // console.log(inView)
         }}>
           {props.video && <video ref={videoRef} controls muted style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}}>
-            <source src={`data:video/mp4;base64,${props.video}`} type="video/mp4" />
+            {/* <source src={`data:video/mp4;base64,${props.video}`} type="video/mp4" /> */}
+            <source src={props.video} type="video/mp4" />
           </video>}
         </InView>
       </Box>

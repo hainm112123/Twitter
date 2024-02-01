@@ -1,7 +1,7 @@
 import { Box, SvgIconTypeMap } from "@mui/material"
 import { fontConfig } from "../../../configs/fontConfig"
 import { OverridableComponent } from "@mui/material/OverridableComponent"
-import { SetStateAction, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { sizeConfig } from "../../../configs/sizeConfig"
 import { colorConfig } from "../../../configs/colorConfig"
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
@@ -9,7 +9,6 @@ import { BookmarkBorder, EqualizerOutlined, FavoriteBorder, FileUploadOutlined, 
 import { RootState, useAppDispatch } from "../../../redux/store"
 import { getAuthor, getTweet, toggleLikeTweet } from "../../../redux/tweetSlice"
 import { useSelector } from "react-redux"
-import NewTweetModal from "./NewTweetModal"
 
 type InterractButton = {
   count?: number,
@@ -75,15 +74,13 @@ type Props = {
   replies: number[],
   views: number,
   setTweet: any,
-  detail: boolean,
-  BriefTweet: JSX.Element,
-  replySuccess?: Function,
+  detail?: boolean,
+  setReplyModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 } 
 
 const TweetInteract = (props: Props) => {
   const dispatch = useAppDispatch();
   const userIdentity = useSelector((state: RootState) => state.user.userIdentity);
-  const [modalOpen, setModalOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -95,13 +92,6 @@ const TweetInteract = (props: Props) => {
 
   return (
     <Box>
-      <NewTweetModal 
-        modalOpen={modalOpen} 
-        setModalOpen={setModalOpen} 
-        isReplyOf={props.id} 
-        BriefTweet={props.BriefTweet} 
-        success={props.replySuccess ? props.replySuccess : () => {}} 
-      />
       <Box
         sx={[
           {
@@ -110,7 +100,7 @@ const TweetInteract = (props: Props) => {
             justifyContent: "space-between",
             pt: 1, 
           },
-          props.detail && {
+          (props.detail === true) && {
             borderBottom: 1,
             borderTop: 1,
             borderColor: colorConfig.border,
@@ -127,7 +117,7 @@ const TweetInteract = (props: Props) => {
           ActiveIcon={ChatBubble}
           onClick={(e) => {
             e.preventDefault();
-            setModalOpen(true);
+            props.setReplyModalOpen(true);
           }}
           active={props.replies.findIndex(async (temp) => {
             const author = await getAuthor(temp);

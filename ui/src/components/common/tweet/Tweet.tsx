@@ -15,18 +15,20 @@ import moment from "moment";
 import { fontConfig } from "../../../configs/fontConfig";
 import Loader from "../Loader";
 import { getReplies, getTweet } from "../../../redux/tweetSlice";
+import NewTweetModal from "./NewTweetModal";
 
 type Props = {
   tweetId: number, 
   detail?: boolean, 
-  isReply: boolean, 
-  isParent: boolean,
+  isReply?: boolean, 
+  isParent?: boolean,
   replySuccess?: Function,
 }
 
-const Tweet = (props: Props | any) => {
+const Tweet = (props: Props) => {
   const dispatch = useAppDispatch();
   const [isLoaded, setLoaded] = useState(false);
+  const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [user, setUser] = useState({
     username: "",
     name: "",
@@ -105,13 +107,8 @@ const Tweet = (props: Props | any) => {
   const Interact = <TweetInteract 
     {...tweet} 
     setTweet={setTweet} 
-    BriefTweet={BriefTweet} 
     detail={props.detail} 
-    replySuccess={async () => {
-      const tweetData = await getTweet(props.tweetId);
-      setTweet(tweetData);
-      props.replySuccess && props.replySuccess();
-    }} 
+    setReplyModalOpen={setReplyModalOpen}
   />
 
   return (
@@ -119,6 +116,19 @@ const Tweet = (props: Props | any) => {
       {
         (tweet.is_reply_of && !props.isReply) && <Tweet tweetId={tweet.is_reply_of} isParent />
       }
+
+      <NewTweetModal 
+        modalOpen={replyModalOpen} 
+        setModalOpen={setReplyModalOpen} 
+        isReplyOf={props.tweetId} 
+        BriefTweet={BriefTweet} 
+        success={async () => {
+          const tweetData = await getTweet(props.tweetId);
+          setTweet(tweetData);
+          props.replySuccess && props.replySuccess();
+        }} 
+      />
+
       <Box
         sx={{
           border: 1,

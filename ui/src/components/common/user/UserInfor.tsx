@@ -25,7 +25,8 @@ const UserInfor = ({self, userIdentity}: Props) => {
       <Box
         sx={{
           ...styleConfig.avatar,
-          backgroundImage: (userIdentity.avatar ? `url('data:image/png;base64,${userIdentity.avatar}')` : defaultAvatar),
+          // backgroundImage: (userIdentity.avatar ? `url('data:image/png;base64,${userIdentity.avatar}')` : defaultAvatar),
+          backgroundImage: (userIdentity.avatar ? `url(${userIdentity.avatar})` : defaultAvatar),
         }}
       />
       <Box

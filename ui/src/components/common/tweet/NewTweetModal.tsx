@@ -33,7 +33,7 @@ const NewTweetModal = (props: Props) => {
             p: 2,
             borderRadius: 4,
           }}
-          onClick={(e) => e.preventDefault()}
+          // onClick={(e) => e.preventDefault()}
         >
           <NewTweet minRows={5} border isModal setModalOpen={props.setModalOpen} isReplyOf={props.isReplyOf} BriefTweet={props.BriefTweet} success={props.success} />
         </Box>

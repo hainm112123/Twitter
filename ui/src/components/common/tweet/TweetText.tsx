@@ -3,7 +3,7 @@ import { fontConfig } from "../../../configs/fontConfig"
 
 type Props = {
   text: string,
-  detail: boolean,
+  detail?: boolean,
 }
 
 const TweetText = (props: Props) => {

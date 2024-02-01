@@ -31,7 +31,8 @@ const ProfileAvatar = (props: Props) => {
         borderRadius: sizeConfig.profileAvatar,
         backgroundPosition: "center",
         backgroundSize: "cover",
-        backgroundImage: props.avatar ? `url(${props.avatar})` : (props.currentAvatar ? `url('data:image/png;base64,${props.currentAvatar}')` : defaultAvatar),
+        // backgroundImage: props.avatar ? `url(${props.avatar})` : (props.currentAvatar ? `url('data:image/png;base64,${props.currentAvatar}')` : defaultAvatar),
+        backgroundImage: props.avatar ? `url(${props.avatar})` : (props.currentAvatar ? `url(${props.currentAvatar})` : defaultAvatar),
       }}
       onLoad={() => {
         URL.revokeObjectURL(props.avatar);

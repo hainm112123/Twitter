@@ -75,14 +75,18 @@ export const refresh = (refresh_token: string) => async (dispatch: AppDispatch) 
 }
 
 export const signup = ({name, username, password, retype_password} : {name: string, username: string, password: string, retype_password: string}) => async (dispatch: AppDispatch) => {
-  const res = await axios.post(
-    signupUrl,
-    axios.toFormData({name, username, password, retype_password})
-  )
-  if (res.status === 200) {
-    return true;
-  }
-  else {
+  try {
+    const res = await axios.post(
+      signupUrl,
+      axios.toFormData({name, username, password, retype_password})
+    )
+    if (res.status === 200) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  } catch(err) {
     return false;
   }
 }

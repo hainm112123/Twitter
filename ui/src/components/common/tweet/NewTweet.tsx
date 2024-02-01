@@ -28,12 +28,13 @@ type AttachProps = {
     Icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>>,
     onChange?: React.ChangeEventHandler<HTMLInputElement>,
     isModal?: boolean,
+    isReplyOf?: number,
 }
 
 const iconPadding = '8px'
 
 const Attach = (props: AttachProps) => {
-  const inputId = props.type + (props.isModal ? '--modal' : '');
+  const inputId = props.type + (props.isModal ? '--modal' : '') + (props.isReplyOf ? '--reply-of-' + props.isReplyOf : '');
 
   return (
     <Box>
@@ -111,7 +112,8 @@ const NewTweet = (props: Props) => {
         <Box
           sx={{
             ...styleConfig.avatar,
-            backgroundImage: (user.avatar ? `url('data:image/png;base64,${user.avatar}')` : defaultAvatar),
+            // backgroundImage: (user.avatar ? `url('data:image/png;base64,${user.avatar}')` : defaultAvatar),
+            backgroundImage: (user.avatar ? `url(${user.avatar})` : defaultAvatar),
           }}
         />
         <TextField 
@@ -141,8 +143,8 @@ const NewTweet = (props: Props) => {
       </Box>
 
       <Box>
-        {media?.type.split('/')[0] === 'image' && <img src={preview} style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}}/>}
-        {media?.type.split('/')[0] === 'video' && <video controls style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}}>
+        {media?.type.split('/')[0] === 'image' && <img src={preview} style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}} />}
+        {media?.type.split('/')[0] === 'video' && <video controls style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}} muted >
           <source src={preview} type="video/mp4" />
         </video>}
       </Box>
@@ -167,7 +169,8 @@ const NewTweet = (props: Props) => {
                 setMedia(e.target.files[0]);
                 setPreview(URL.createObjectURL(e.target.files[0]))
               }
-            }} 
+            }}
+            isReplyOf={props.isReplyOf} 
           />
           <Attach type="gif" Icon={GifBoxOutlined} />
           <Attach type="poll" Icon={PollOutlined} />
