@@ -1,8 +1,10 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
+import base64, re, boto3
+
 from models import User
 from db import db
-from flask_jwt_extended import jwt_required, get_jwt_identity
-import base64, re
+from init import upload_image
 
 user = Blueprint('user', __name__)
 
@@ -31,19 +33,22 @@ def configDict(user):
 @jwt_required()
 def get_all_users():
   users = User.query.all()
-  return jsonify(list(map(configUser, users)))
+  # return jsonify(list(map(configUser, users)))
+  return jsonify(users)
 
 @user.route('/user-info/<string:username>')
 @jwt_required()
 def get_user(username):
   user = User.query.filter_by(username=username).first_or_404()
-  return jsonify(configUser(user))
+  # return jsonify(configUser(user))
+  return jsonify(user)
 
 @user.route('/user-identity')
 @jwt_required()
 def user_identity():
   user = User.query.get_or_404(get_jwt_identity()["id"])
-  return jsonify(configUser(user))
+  # return jsonify(configUser(user))
+  return jsonify(user)
 
 @user.route('/others')
 @jwt_required()
@@ -51,7 +56,8 @@ def others():
   users = User.query.all()
   user = get_jwt_identity()
   users = [_user for _user in users if _user.id != user["id"]]
-  return jsonify(list(map(configUser, users)))
+  # return jsonify(list(map(configUser, users)))
+  return jsonify(users)
 
 @user.route('/update-bio', methods=['POST'])
 @jwt_required()
@@ -63,7 +69,10 @@ def update_bio():
       # print(key, type(new_user_bio[key]))
       # continue
       if (key == 'cover' or key == 'avatar'):
-        setattr(user, key, base64.decodebytes(new_user_bio[key].encode('utf-8')))
+        # setattr(user, key, base64.decodebytes(new_user_bio[key].encode('utf-8')))
+        object_key = user.username+'_'+key
+        url = upload_image(object_key, base64.decodebytes(new_user_bio[key].encode('utf-8')))
+        setattr(user, key, url)
       else:
         setattr(user, key, new_user_bio[key])
   # if (new_user_bio["name"]):

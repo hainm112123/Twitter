@@ -1,7 +1,8 @@
 from os.path import join, dirname
-import os
+import os, sys
 from datetime import timedelta
 import logging
+import boto3.session
 
 from dotenv import load_dotenv
 from flask import Flask, request, Response
@@ -12,6 +13,8 @@ from flask_cors import CORS
 import redis
 from flask_wtf import CSRFProtect
 from flask_migrate import Migrate
+from botocore.config import Config
+from botocore.exceptions import ClientError
 
 from db import db
 
@@ -51,3 +54,30 @@ jwt = JWTManager(app)
 jwt_redis_blocklist = redis.StrictRedis(
   host = "localhost", port = 6379, db = 0, decode_responses=True
 )
+
+
+endpoint = os.environ.get('ENDPOINT')
+key_id_ro = os.environ.get('KEY_ID_RO')
+application_key_ro = os.environ.get('APPLICATION_KEY_RO')
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+b2session = boto3.session.Session(profile_name='twitter-dev')
+b2 = b2session.resource(service_name='s3', endpoint_url=endpoint)
+b2_client = b2session.client(service_name='s3', endpoint_url=endpoint)
+# b2 = b2session.resource(service_name='s3', 
+#                     aws_access_key_id=key_id_ro, 
+#                     aws_secret_access_key=application_key_ro, 
+#                     endpoint_url=endpoint, 
+#                     config=Config(signature_version='s3v4'))
+
+def upload_object(key, body):
+  b2.Bucket(BUCKET_NAME).put_object(Key=key, Body=body)
+  url = "%s/%s/%s" % (endpoint, BUCKET_NAME, key)
+  return url
+
+def get_public_url(extens):
+  def get_url(name, body):
+    return upload_object(name + extens, body)
+  return get_url
+
+upload_image = get_public_url('.png')
+upload_video = get_public_url('.mp4')

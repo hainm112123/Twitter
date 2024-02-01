@@ -21,7 +21,7 @@ def signup():
     user.add()
     return {"msg": "success"}, 200
   else:
-    return form.errors, 401
+    return form.errors, 403
 
 @auth.route('/login', methods=['GET', 'POST'])
 # @cross_origin(origin='localhost',headers=['Content-Type','Authorization'])
