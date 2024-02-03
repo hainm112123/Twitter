@@ -5,32 +5,44 @@ import { fontConfig } from "../configs/fontConfig";
 import { styleConfig } from "../configs/styleConfig";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
+import { RootState, useAppDispatch } from "../redux/store";
 import Tweet from "../components/common/tweet/Tweet";
 import Loader from "../components/common/Loader";
 import NewTweet from "../components/common/tweet/NewTweet";
 import { colorConfig } from "../configs/colorConfig";
-import { getReplies } from "../redux/tweetSlice";
+import { addReply, getCurrentTweet, getParentTweet, getReplies } from "../redux/tweetSlice";
+import TweetType from "../types/TweetType";
 
 type Props = {}
 
 const TweetPage = (props: Props) => {
-  const params = useParams();
-  const tweet = Number(params.id)
-
-  const [replies, setReplies] = useState([]);
-  const get_replies = async () => {
-    setReplies(await getReplies(tweet));
-  }
-
-  useEffect(() => {
-    get_replies();
-  }, [tweet])
+  const [loaded, setLoaded] = useState(false);
+  const tweetId = Number(useParams().id);
+  const dispatch = useAppDispatch();
+  const tweet = useSelector((state: RootState) => state.tweet.currentTweet);
+  const replies = useSelector((state: RootState) => state.tweet.replies);
+  const parentTweets = useSelector((state: RootState) => state.tweet.parentTweets);
+  const users = useSelector((state: RootState) => state.user.users);
+  const user = users.find((user) => user.username === tweet?.author);
   
-  if (!tweet) {
+  useEffect(() => {
+    if (!loaded) {
+      setLoaded(true);
+      return;
+    }
+    dispatch(getCurrentTweet(tweetId));
+    dispatch(getParentTweet(tweetId));
+    dispatch(getReplies(tweetId));
+  }, [dispatch, tweetId, loaded])
+
+  if (!tweet || !user) {
     return (
       <Loader />
     )
+  }
+
+  const replySuccess = (response: TweetType | null) => {
+    if (response) dispatch(addReply(response));
   }
 
   return (
@@ -40,19 +52,28 @@ const TweetPage = (props: Props) => {
           Tweet
         </Box>
       </HeaderWithBack>
-      <Tweet tweetId={tweet} detail replySuccess={get_replies} />
+      {
+        parentTweets.map((tweet, index) => {
+          const user = users.find((user) => user.username === tweet.author);
+          return (<Tweet tweet={tweet} user={user} key={index} isParent />)
+        })
+      }
+      <Tweet tweet={tweet} user={user} detail replySuccess={replySuccess} />
       <Box sx={{
         border: 1,
         borderTop: 0,
         borderColor: colorConfig.border,
-        p: "12px",
       }}>
-        <NewTweet isReplyOf={tweet} success={get_replies} />
+        <NewTweet 
+          isReplyOf={tweet.id} 
+          success={replySuccess} 
+        />
       </Box>
       {
-        replies.map((reply, index) => (
-          <Tweet tweetId={reply} key={index} isReply />
-        ))
+        replies.map((reply, index) => {
+          const user = users.find((user) => user.username === reply.author);
+          return (<Tweet tweet={reply} user={user} key={index} isReply />);
+        })
       }
     </Box>
   )

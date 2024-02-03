@@ -8,7 +8,7 @@ import RightSidebar from '../common/sidebar/RightSidebar';
 import { useCookies } from 'react-cookie';
 import { RootState, useAppDispatch } from '../../redux/store';
 import { useSelector } from 'react-redux';
-import { getOtherUsers, getUserIdentity } from '../../redux/userSlice';
+import { getOtherUsers, getUserIdentity, getUsers } from '../../redux/userSlice';
 import { getTweets } from '../../redux/tweetSlice';
 
 function MainLayout() {
@@ -33,7 +33,8 @@ function MainLayout() {
     }
     dispatch(getUserIdentity());
     dispatch(getOtherUsers());
-    dispatch(getTweets())
+    dispatch(getTweets());
+    dispatch(getUsers());
   }, [navigate, access_token, refresh_token, dispatch, isLoaded])
 
   return (

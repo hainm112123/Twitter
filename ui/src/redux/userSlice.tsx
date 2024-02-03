@@ -1,20 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { AppDispatch } from "./store"
 import axios from "axios"
-import { userIdentityUrl, userOthersUrl, userUpdateBioUrl, userUrl } from "../variables/urls"
+import { userIdentityUrl, userOthersUrl, userUpdateBioUrl, userUrl, usersUrl } from "../variables/urls"
 import { UserIdentity } from "../types/UserIdentity"
 window.Buffer = window.Buffer || require('buffer').Buffer
 
 type userState = {
   userIdentity: UserIdentity | null,
   others: UserIdentity[],
-  users: UserIdentity[], 
+  users: UserIdentity[],
+  currentUser: UserIdentity | null, 
 }
 
 const initialState: userState = {
   userIdentity: null,
   others: [],
   users: [],
+  currentUser: null
 }
 
 export const userSlice = createSlice({
@@ -29,11 +31,14 @@ export const userSlice = createSlice({
     },
     setUsers(state, action) {
       state.users = action.payload
+    },
+    setCurrentUser(state, action) {
+      state.currentUser = action.payload
     }
   }
 })
 
-export const { setUsers, setUserIdentity, setOtherUsers } = userSlice.actions;
+export const { setUsers, setUserIdentity, setOtherUsers, setCurrentUser } = userSlice.actions;
 
 export const getUserIdentity = () => async (dispath: AppDispatch) => {
   try {
@@ -41,6 +46,17 @@ export const getUserIdentity = () => async (dispath: AppDispatch) => {
     dispath(setUserIdentity(res.data))
   } catch(err) {
     console.error(err);
+  }
+}
+
+export const getUsers = () => async (dispatch: AppDispatch) => {
+  try {
+    const res = await axios.get(usersUrl);
+    dispatch(setUsers(res.data));
+    return res.data;
+  }
+  catch(err) {
+    return null;
   }
 }
 
@@ -53,10 +69,15 @@ export const getOtherUsers = () => async (dispatch: AppDispatch) => {
   }
 }
 
-export const getUser = (username: any) => async (dispatch: AppDispatch) => {
-  const res = await axios.get(userUrl + username);
-  // console.log(res.data);
-  return res.data;
+export const getCurrentUser = (username: any) => async (dispatch: AppDispatch) => {
+  try {
+    const res = await axios.get(userUrl + username);
+    dispatch(setCurrentUser(res.data));
+    return res.data;
+  }
+  catch(err) {
+    return null;
+  }
 }
 
 export const updateBio = async (fileCover?: File, fileAvatar?: File, name?: string, bio?: string) => {
@@ -71,6 +92,7 @@ export const updateBio = async (fileCover?: File, fileAvatar?: File, name?: stri
     name,
     bio
   });
+  return res.data;
 }
 
 export const userSliceReducer = userSlice.reducer

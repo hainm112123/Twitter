@@ -1,6 +1,6 @@
 import { Box, Modal } from "@mui/material";
 import { colorConfig } from "../../../configs/colorConfig";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import NewTweet from "./NewTweet";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   setModalOpen: Dispatch<SetStateAction<boolean>>,
   isReplyOf?: number,
   BriefTweet?: JSX.Element,
-  success: Function
+  success?: Function
 }
 
 const NewTweetModal = (props: Props) => {
@@ -30,10 +30,8 @@ const NewTweetModal = (props: Props) => {
             boxShadow: 24,
             width: "30%",
             bgcolor: colorConfig.mainBg,
-            p: 2,
             borderRadius: 4,
           }}
-          // onClick={(e) => e.preventDefault()}
         >
           <NewTweet minRows={5} border isModal setModalOpen={props.setModalOpen} isReplyOf={props.isReplyOf} BriefTweet={props.BriefTweet} success={props.success} />
         </Box>

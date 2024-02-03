@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-import base64, re, boto3
+import base64, re, boto3, uuid
+from sqlalchemy.orm import defer, load_only
 
 from models import User
 from db import db
@@ -32,22 +33,21 @@ def configDict(user):
 @user.route('/all')
 @jwt_required()
 def get_all_users():
-  users = User.query.all()
-  # return jsonify(list(map(configUser, users)))
-  return jsonify(users)
+  users = db.session.execute(db.select(User)).scalars()
+  # users = db.session.query(User).options(defer(User.hashed_password)).all()
+  # print(str(db.session.query(User).options(defer(User.hashed_password)).statement))
+  return jsonify(list(users))
 
 @user.route('/user-info/<string:username>')
 @jwt_required()
 def get_user(username):
   user = User.query.filter_by(username=username).first_or_404()
-  # return jsonify(configUser(user))
   return jsonify(user)
 
 @user.route('/user-identity')
 @jwt_required()
 def user_identity():
   user = User.query.get_or_404(get_jwt_identity()["id"])
-  # return jsonify(configUser(user))
   return jsonify(user)
 
 @user.route('/others')
@@ -56,7 +56,6 @@ def others():
   users = User.query.all()
   user = get_jwt_identity()
   users = [_user for _user in users if _user.id != user["id"]]
-  # return jsonify(list(map(configUser, users)))
   return jsonify(users)
 
 @user.route('/update-bio', methods=['POST'])
@@ -66,22 +65,11 @@ def update_bio():
   new_user_bio = request.json
   for key in new_user_bio:
     if new_user_bio[key]:
-      # print(key, type(new_user_bio[key]))
-      # continue
       if (key == 'cover' or key == 'avatar'):
-        # setattr(user, key, base64.decodebytes(new_user_bio[key].encode('utf-8')))
-        object_key = user.username+'_'+key
+        object_key = user.username+'_'+key+'_'+uuid.uuid4().hex
         url = upload_image(object_key, base64.decodebytes(new_user_bio[key].encode('utf-8')))
         setattr(user, key, url)
       else:
         setattr(user, key, new_user_bio[key])
-  # if (new_user_bio["name"]):
-  #   user.name = new_user_bio["name"]
-  # if (new_user_bio["bio"]):
-  #   user.bio = new_user_bio["bio"]
-  # if ("cover" in new_user_bio and new_user_bio["cover"]):
-  #   user.cover = base64.decodebytes(new_user_bio["cover"].encode('utf-8'))
-  # if ("avatar" in new_user_bio and new_user_bio["avatar"]):
-  #   user.avatar = base64.decodebytes(new_user_bio["avatar"].encode('utf-8'))
   db.session.commit()
-  return {"msg": "success"}, 200
+  return jsonify(user)

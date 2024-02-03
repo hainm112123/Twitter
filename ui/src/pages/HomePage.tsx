@@ -8,7 +8,8 @@ import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../redux/store";
 import Loader from "../components/common/Loader";
 import { fontConfig } from "../configs/fontConfig";
-import { getTweets } from "../redux/tweetSlice";
+import { addTweet } from "../redux/tweetSlice";
+import TweetType from "../types/TweetType";
 
 type Props = {}
 
@@ -63,7 +64,8 @@ const HomePage = (props: Props) => {
   const dispatch = useAppDispatch();
 
   const FORYOU = 'for-you', FOLLOWING = 'following';
-  let tweets = useSelector((state: RootState) => state.tweet.tweets);
+  const tweets = useSelector((state: RootState) => state.tweet.tweets);
+  const users = useSelector((state: RootState) => state.user.users);
   const userIdentity = useSelector((state: RootState) => state.user.userIdentity);
   const [filter, setFilter] = useState(FORYOU)
 
@@ -92,13 +94,19 @@ const HomePage = (props: Props) => {
           p: 2,
         }}
       >
-        <NewTweet success={() => dispatch(getTweets())} />
+        <NewTweet success={(response: TweetType | null) => {
+          if (response) dispatch(addTweet(response));
+        }} />
       </Box>
 
       {/* tweets */}
       {
         tweets.map((tweet, index) => (
-          <Tweet tweetId={tweet} key={index} />
+          <Tweet 
+            tweet={tweet} 
+            user={users.find((user) => user.username === tweet.author)}
+            key={index} 
+          />
         ))
       }
     </Box>

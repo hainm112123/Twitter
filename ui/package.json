@@ -17,6 +17,7 @@
     "@types/react-dom": "^18.2.17",
     "axios": "^1.6.2",
     "buffer": "^6.0.3",
+    "framer-motion": "^11.0.3",
     "jquery": "^3.7.1",
     "moment": "^2.30.1",
     "react": "^18.2.0",

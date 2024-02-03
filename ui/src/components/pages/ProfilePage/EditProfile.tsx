@@ -7,12 +7,15 @@ import { styleConfig } from "../../../configs/styleConfig"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import ProfileCover from "./ProfileCover"
 import ProfileAvatar from "./ProfileAvatar"
-import { updateBio } from "../../../redux/userSlice"
+import { setCurrentUser, setUserIdentity, updateBio } from "../../../redux/userSlice"
+import LinearLoader from "../../common/LinearLoader"
+import { useAppDispatch } from "../../../redux/store"
 
 type Props = {
   setModalOpen: Dispatch<SetStateAction<boolean>>,
   currentAvatar?: any,
   currentCover?: any,
+
 }
 
 type ChangePhotoProps = {
@@ -64,6 +67,8 @@ const EditProfile = (props: Props) => {
   const [avatar, setAvatar] = useState()
   const [fileCover, setFileCover] = useState()
   const [fileAvatar, setFileAvatar] = useState()
+  const [loaderShow, setLoaderShow] = useState(false);
+  const dispatch = useAppDispatch();
 
   return (
     <FormControl sx={{
@@ -71,6 +76,7 @@ const EditProfile = (props: Props) => {
       top: '50%',
       transform: 'translate(-50%, -50%)',
     }}>
+      <LinearLoader show={loaderShow} />
       <Box sx={{
         display: "flex",
         alignItems: "center",
@@ -98,10 +104,13 @@ const EditProfile = (props: Props) => {
             padding: "4px 16px"
           }}
           onClick={() => {
-            updateBio(fileCover, fileAvatar, name, bio).then(() => {
-              window.location.reload();
+            setLoaderShow(true);
+            updateBio(fileCover, fileAvatar, name, bio).then((res) => {
+              dispatch(setCurrentUser(res));
+              dispatch(setUserIdentity(res));
+              setLoaderShow(false);
+              props.setModalOpen(false);
             });
-            props.setModalOpen(false);
           }}
         >
           Save
@@ -112,8 +121,8 @@ const EditProfile = (props: Props) => {
       <ProfileCover 
         sx={{
           position: 'relative',
-          ml: -2,
-          mr: -2,
+          ml: "-14px",
+          mr: "-14px",
         }}
         cover={cover}
         currentCover={props.currentCover}

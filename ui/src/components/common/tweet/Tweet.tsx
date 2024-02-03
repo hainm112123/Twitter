@@ -1,10 +1,7 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import { colorConfig } from "../../../configs/colorConfig";
-import TweetType from "../../../types/TweetType";
-import { useAppDispatch } from "../../../redux/store";
-import { getUser } from "../../../redux/userSlice";
 import { Link } from "react-router-dom";
 import TweetAvatar from "./TweetAvatar";
 import TweetAuthor from "./TweetAuthor";
@@ -14,65 +11,35 @@ import TweetInteract from "./TweetInteract";
 import moment from "moment";
 import { fontConfig } from "../../../configs/fontConfig";
 import Loader from "../Loader";
-import { getReplies, getTweet } from "../../../redux/tweetSlice";
 import NewTweetModal from "./NewTweetModal";
+import TweetType from "../../../types/TweetType";
+import { UserIdentity } from "../../../types/UserIdentity";
+import { useAppDispatch } from "../../../redux/store";
+import { addReply_brief } from "../../../redux/tweetSlice";
 
 type Props = {
-  tweetId: number, 
+  tweet: TweetType,
+  user: UserIdentity | undefined, 
   detail?: boolean, 
   isReply?: boolean, 
   isParent?: boolean,
   replySuccess?: Function,
 }
 
-const Tweet = (props: Props) => {
-  const dispatch = useAppDispatch();
+const Tweet = ({tweet, user, ...props}: Props) => {
   const [isLoaded, setLoaded] = useState(false);
   const [replyModalOpen, setReplyModalOpen] = useState(false);
-  const [user, setUser] = useState({
-    username: "",
-    name: "",
-    tweets: [],
-    followers: [],
-    following: [],
-    cover: null,
-    avatar: null,
-    bio: "",
-    joined_date: null,
-  });
-  const [tweet, setTweet] = useState({
-    id: -1,
-    author: null,
-    text: "",
-    photos: [],
-    likes: [],
-    retweets: [],
-    replies: [],
-    views: 0,
-    created_at: null,
-    is_reply_of: null,
-  });
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!isLoaded) {
       setLoaded(true);
       return;
     }
-    const fn = async () => {
-      // console.log(props.tweetId);
-      const tweetData = await getTweet(props.tweetId);
-      setTweet(tweetData);
-      const userData = await dispatch(getUser(tweetData.author));
-      setUser(userData);
-    }
-    fn();
-     
-  }, [isLoaded, dispatch, props])
+  }, [isLoaded])
 
-  if (!tweet.author) {
-    return (
-      <Loader />
-    )
+  if (!user) {
+    return <Loader />
   }
 
   const BriefTweet = (
@@ -99,34 +66,34 @@ const Tweet = (props: Props) => {
       </Box>
     </Box>
   )
-
+  
+  // console.log(user);
   const Avatar = <TweetAvatar username={user.username} avatar={user.avatar} onReply={props.isParent} />
   const Author = <TweetAuthor username={user.username} name={user.name} created_at={tweet.created_at} detail={props.detail} />
   const Text = <TweetText text={tweet.text} detail={props.detail} />
   const Media = <TweetMedia {...tweet} />
   const Interact = <TweetInteract 
     {...tweet} 
-    setTweet={setTweet} 
     detail={props.detail} 
     setReplyModalOpen={setReplyModalOpen}
   />
 
+  const replySuccess = (response: TweetType | null) => {
+    if (response) dispatch(addReply_brief(response));
+  }
+
   return (
     <Box>
-      {
-        (tweet.is_reply_of && !props.isReply) && <Tweet tweetId={tweet.is_reply_of} isParent />
-      }
+      {/* {
+        (tweet.is_reply_of && !props.isReply) && (<Tweet tweet={parentTweet} isParent />)
+      } */}
 
       <NewTweetModal 
         modalOpen={replyModalOpen} 
         setModalOpen={setReplyModalOpen} 
-        isReplyOf={props.tweetId} 
+        isReplyOf={tweet.id} 
         BriefTweet={BriefTweet} 
-        success={async () => {
-          const tweetData = await getTweet(props.tweetId);
-          setTweet(tweetData);
-          props.replySuccess && props.replySuccess();
-        }} 
+        success={props.replySuccess ?? replySuccess} 
       />
 
       <Box
@@ -135,8 +102,8 @@ const Tweet = (props: Props) => {
           borderTop: 0,
           borderBottom: (props.detail || props.isParent) ? 0 : 1,
           borderColor: colorConfig.border,
-          padding: "12px",
-          pb: props.isParent ? 0 : "12px",
+          padding: 2,
+          pb: props.isParent ? 0 : 2,
           "&:hover": {
             cursor: "pointer"
           }

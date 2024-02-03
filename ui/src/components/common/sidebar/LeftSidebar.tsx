@@ -1,5 +1,5 @@
-import { Box, Button, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Modal, Paper, Popover, Typography } from "@mui/material";
-import React, { ReactNode, useState } from "react";
+import { Box, Button, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { useState } from "react";
 import { fontConfig } from "../../../configs/fontConfig";
 import { colorConfig } from "../../../configs/colorConfig";
 import logo from "../../../assets/images/logo.png"
@@ -13,9 +13,9 @@ import { useCookies } from "react-cookie";
 import { logout } from "../../../redux/authSlice";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import NewTweet from "../tweet/NewTweet";
 import NewTweetModal from "../tweet/NewTweetModal";
-import { getTweets } from "../../../redux/tweetSlice";
+import { getProfileTweets, getTweets } from "../../../redux/tweetSlice";
+import Loader from "../Loader";
 
 type Props = {}
 
@@ -25,7 +25,8 @@ items.unshift({
   state: "home",
   path: "/",
   sidebarProps: {
-    icon: <img src={logo} style={{}}/>,
+    icon: <img src={logo} style={{}} alt='logo' />,
+    iconActive: <img src={logo} style={{}} alt='logo' />,
   }
 })
 
@@ -48,6 +49,12 @@ const LeftSidebar = (props: Props) => {
     navigate('/auth/login');
   }
 
+  const states = window.location.pathname.split('/');
+
+  if (!userIdentity) {
+    return <Loader />
+  }
+
   return (
     <Box 
       sx={{
@@ -62,10 +69,13 @@ const LeftSidebar = (props: Props) => {
     >
       <List>
         {
-          items.map((item, index) => (
+          items.map((item, index) => {
+            const active = item.state === 'profile' ? (states[1] === 'profile' && states[2] === userIdentity.username) : 
+                           (item.state == 'home' ? states[1] === '' : item.state === states[1]);
+            return (
             <ListItem key={index} disablePadding sx={{width: "fit-content"}}>
               <Link 
-                to={item.state !== 'profile' ? item.path : '/profile/' + userIdentity?.username}
+                to={item.state !== 'profile' ? item.path : '/profile/' + userIdentity.username}
                 style={{
                   textDecoration: "none",
                   color: "unset"
@@ -82,6 +92,9 @@ const LeftSidebar = (props: Props) => {
                     },
                     index !== 0 && {
                       paddingRight: "24px",
+                    },
+                    active && {
+                      fontWeight: fontConfig.weight.subHeader,
                     }
                   ]}
                 >
@@ -90,13 +103,13 @@ const LeftSidebar = (props: Props) => {
                       color: "inherit",
                     }}
                   >
-                    {item.sidebarProps?.icon}
+                    {active ? item.sidebarProps?.iconActive : item.sidebarProps?.icon}
                   </ListItemIcon>
                   <ListItemText disableTypography>{item.sidebarProps?.displayText}</ListItemText>
                 </ListItemButton>
               </Link>
             </ListItem>
-          ))
+          )})
         }
       </List>
 
@@ -136,7 +149,10 @@ const LeftSidebar = (props: Props) => {
         <NewTweetModal 
           modalOpen={modalOpen} 
           setModalOpen={setModalOpen} 
-          success={() => dispatch(getTweets())} 
+          success={() => {
+            dispatch(getTweets());
+            dispatch(getProfileTweets(userIdentity.username))
+          }} 
         />
       </Box>
 

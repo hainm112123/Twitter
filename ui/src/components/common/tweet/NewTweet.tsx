@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, SvgIconTypeMap, TextField } from "@mui/material"
+import { Box, Button, SvgIconTypeMap, TextField } from "@mui/material"
 import { sizeConfig } from "../../../configs/sizeConfig"
 import { fontConfig } from "../../../configs/fontConfig"
 import { BrokenImageOutlined, Close, GifBoxOutlined, LocationOnOutlined, PendingActionsOutlined, PollOutlined, SentimentSatisfiedAltOutlined } from "@mui/icons-material"
@@ -10,8 +10,9 @@ import { RootState, useAppDispatch } from "../../../redux/store"
 import { defaultUser } from "../../../types/UserIdentity"
 import { defaultAvatar } from "../../../variables/variables"
 import { styleConfig } from "../../../configs/styleConfig"
-import { getUser } from "../../../redux/userSlice"
 import { newTweet } from "../../../redux/tweetSlice"
+import Loader from "../Loader"
+import LinearLoader from "../LinearLoader"
 
 type Props = {
   minRows?: number,
@@ -20,7 +21,7 @@ type Props = {
   isReplyOf?: number,
   setModalOpen?: Dispatch<SetStateAction<boolean>>,
   BriefTweet?: JSX.Element,
-  success: Function
+  success?: Function
 }
 
 type AttachProps = {
@@ -71,27 +72,40 @@ const Attach = (props: AttachProps) => {
 }
 
 const NewTweet = (props: Props) => {
-  const dispatch = useAppDispatch();
   const userIdentity = useSelector((state: RootState) => state.user.userIdentity);
   const [isLoaded, setLoaded] = useState(false);
-  const [user, setUser] = useState(defaultUser);
   const [text, setText] = useState("");
   const [media, setMedia] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>();
+  const [loaderShow, setLoaderShow] = useState(false);
 
   useEffect(() => {
     if (!isLoaded) {
       setLoaded(true);
       return;
     }
-    const fn = async () => {
-      if (userIdentity) setUser(await dispatch(getUser(userIdentity?.username)))
-    }
-    fn();
-  }, [isLoaded, dispatch, userIdentity]);
+  }, [isLoaded]);
+
+  if (!userIdentity) {
+    return <Loader />
+  }
 
   return (
-    <Box>
+    <Box sx={{
+      position: 'relative',
+      p: 2,
+    }}>
+      <LinearLoader 
+        show={loaderShow}
+        sx={{
+          borderRadius: props.isModal ? styleConfig.modal.borderRadius : 0,
+        }}  
+        loaderSx={[
+          props.isModal === true && {
+            mt: "10px",
+          }
+        ]}
+      />
       {
         props.isModal && (
           <Box sx={{
@@ -112,8 +126,7 @@ const NewTweet = (props: Props) => {
         <Box
           sx={{
             ...styleConfig.avatar,
-            // backgroundImage: (user.avatar ? `url('data:image/png;base64,${user.avatar}')` : defaultAvatar),
-            backgroundImage: (user.avatar ? `url(${user.avatar})` : defaultAvatar),
+            backgroundImage: (userIdentity.avatar ? `url(${userIdentity.avatar})` : defaultAvatar),
           }}
         />
         <TextField 
@@ -143,7 +156,7 @@ const NewTweet = (props: Props) => {
       </Box>
 
       <Box>
-        {media?.type.split('/')[0] === 'image' && <img src={preview} style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}} />}
+        {media?.type.split('/')[0] === 'image' && <img src={preview} style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}} alt='media' />}
         {media?.type.split('/')[0] === 'video' && <video controls style={{maxWidth: "100%", maxHeight: sizeConfig.imgMaxHeight}} muted >
           <source src={preview} type="video/mp4" />
         </video>}
@@ -165,7 +178,7 @@ const NewTweet = (props: Props) => {
             isModal={props.isModal}
             onChange={(e) => {
               // console.log(e.target.files)
-              if (e.target.files !== null) {
+              if (e.target.files !== null && e.target.files.length > 0) {
                 setMedia(e.target.files[0]);
                 setPreview(URL.createObjectURL(e.target.files[0]))
               }
@@ -180,11 +193,13 @@ const NewTweet = (props: Props) => {
         </Box>
 
         <Button className="primary" onClick={() => {
-          newTweet(user.username, text, media, props.isReplyOf).then(() => {
+          setLoaderShow(true);
+          newTweet(userIdentity.username, text, media, props.isReplyOf).then((res) => {
             setText("");
             setMedia(null);
+            if (props.success) props.success(res);
             if (props.isModal && props.setModalOpen) props.setModalOpen(false);
-            props.success();
+            setLoaderShow(false);
           });
         }}> 
           {props.isReplyOf ? 'Reply' : 'Tweet'} 

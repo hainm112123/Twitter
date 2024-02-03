@@ -1,4 +1,4 @@
-import { Box, SvgIconTypeMap } from "@mui/material"
+import { Box, CircularProgress, SvgIconTypeMap } from "@mui/material"
 import { fontConfig } from "../../../configs/fontConfig"
 import { OverridableComponent } from "@mui/material/OverridableComponent"
 import { useEffect, useState } from "react"
@@ -7,8 +7,9 @@ import { colorConfig } from "../../../configs/colorConfig"
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { BookmarkBorder, EqualizerOutlined, FavoriteBorder, FileUploadOutlined, RepeatOutlined, Favorite, ChatBubble, Bookmark } from "@mui/icons-material";
 import { RootState, useAppDispatch } from "../../../redux/store"
-import { getAuthor, getTweet, toggleLikeTweet } from "../../../redux/tweetSlice"
 import { useSelector } from "react-redux"
+import { toggleLikeTweet } from "../../../redux/tweetSlice"
+import { motion } from 'framer-motion'
 
 type InterractButton = {
   count?: number,
@@ -34,22 +35,32 @@ const InteractButton = (props: InterractButton) => {
       onMouseLeave={() => setHover(false)}
       onClick={props.onClick}
     >
-      <Icon sx={[
-        {
-          fontSize: fontConfig.size.secondaryIcon,
-          borderRadius: sizeConfig.interactBtnBR,
-          padding: "6px 6px 4px",
-          display: "flex",
-          alignItems: "center",
-        },
-        (isHover || props.active) && {
-          color: props.color,
-          transition: colorConfig.btnTransition,
-        },
-        isHover && {
-          bgcolor: props.bgcolor,
-        }
-      ]} />
+      <motion.div
+        whileTap={{
+          scale: 2,
+          transition: { duration: 1 },
+        }}
+      >
+        <Icon 
+          sx={[
+            {
+              fontSize: fontConfig.size.secondaryIcon,
+              borderRadius: sizeConfig.interactBtnBR,
+              padding: "6px 6px 4px",
+              display: "flex",
+              alignItems: "center",
+              transition: 'transform 0.3s ease-in-out'
+            },
+            (isHover || props.active) && {
+              color: props.color,
+              transition: colorConfig.btnTransition,
+            },
+            isHover && {
+              bgcolor: props.bgcolor,
+            },
+          ]} 
+        />
+      </motion.div>
       {
         props.count !== undefined && <Box 
           sx={[
@@ -73,14 +84,13 @@ type Props = {
   retweets: string[],
   replies: number[],
   views: number,
-  setTweet: any,
   detail?: boolean,
   setReplyModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 } 
 
 const TweetInteract = (props: Props) => {
-  const dispatch = useAppDispatch();
   const userIdentity = useSelector((state: RootState) => state.user.userIdentity);
+  const dispatch = useAppDispatch();
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -89,6 +99,10 @@ const TweetInteract = (props: Props) => {
       return;
     }
   }, [loaded])
+
+  if (!userIdentity) {
+    return <CircularProgress />
+  }
 
   return (
     <Box>
@@ -119,10 +133,7 @@ const TweetInteract = (props: Props) => {
             e.preventDefault();
             props.setReplyModalOpen(true);
           }}
-          active={props.replies.findIndex(async (temp) => {
-            const author = await getAuthor(temp);
-            return author === userIdentity?.username
-          }) != -1}
+          active={false}
         />
 
         <InteractButton 
@@ -145,14 +156,9 @@ const TweetInteract = (props: Props) => {
           ActiveIcon={Favorite}
           onClick={(e) => {
             e.preventDefault();
-            const fn = async () => {
-              await dispatch(toggleLikeTweet(props.id, userIdentity?.username));
-              const tweetData = await getTweet(props.id)
-              props.setTweet(tweetData);
-            }
-            fn();
+            dispatch(toggleLikeTweet(props.id, userIdentity.username));
           }}
-          active={props.likes.findIndex((temp) => temp === userIdentity?.username) !== -1}
+          active={props.likes.findIndex((temp) => temp === userIdentity.username) !== -1}
         />
 
         <InteractButton 

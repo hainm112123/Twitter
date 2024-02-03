@@ -49,8 +49,6 @@ export const styleConfig = {
     position: "absolute" as "absoulute",
     left: "50%",
     transform: "translateX(-50%)",
-    border: 2,
-    borderColor: colorConfig.mainBg,
     boxShadow: 24,
     minWidth: 400,
     width: "30%",

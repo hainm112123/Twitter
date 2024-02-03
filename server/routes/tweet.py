@@ -39,18 +39,18 @@ def encodeTweet(tweet):
 
 @tweet.route('/all')
 def get_all_tweet(): 
-  tweets = db.session.execute(db.select(Tweet.id).order_by(desc(Tweet.created_at)).where(Tweet.is_reply_of == None)).scalars()
+  tweets = db.session.execute(db.select(Tweet).order_by(desc(Tweet.created_at)).where(Tweet.is_reply_of == None)).scalars()
   return jsonify(list(tweets))
   # return jsonify(list(map(configTweet, tweets)))
 
 @tweet.route('/replies/<int:tweet_id>')
 def get_replies(tweet_id):
-  replies = db.session.execute(db.select(Tweet.id).order_by(desc(Tweet.created_at)).where(Tweet.is_reply_of == tweet_id)).scalars()
+  replies = db.session.execute(db.select(Tweet).order_by(desc(Tweet.created_at)).where(Tweet.is_reply_of == tweet_id)).scalars()
   return jsonify(list(replies))
 
 @tweet.route('/get-by-author/<string:author>')
 def get_by_author(author):
-  tweets = db.session.execute(db.select(Tweet.id).order_by(desc(Tweet.created_at)).where((Tweet.author == author) & (Tweet.is_reply_of  == None))).scalars()
+  tweets = db.session.execute(db.select(Tweet).order_by(desc(Tweet.created_at)).where((Tweet.author == author) & (Tweet.is_reply_of  == None))).scalars()
   return jsonify(list(tweets))
 
 @tweet.route('/get/<int:id>')
@@ -91,11 +91,11 @@ def create_tweet():
     parent.replies = replies
 
   db.session.commit()
-  return {"msg": "success"}, 200
+  return jsonify(new_tweet), 200
 
 @tweet.route('/toggle-like', methods=['POST'])
 @jwt_required()
-def toggle_tweet():
+def toggle_like():
   tweet = Tweet.query.get_or_404(int(request.json['tweet_id']))
   likes = copy.deepcopy(tweet.likes)
   try:
@@ -106,4 +106,4 @@ def toggle_tweet():
     likes = tweet.likes + [request.json['username']]
   tweet.likes = likes
   db.session.commit()
-  return {"msg": "success"}, 200
+  return jsonify(tweet), 200
