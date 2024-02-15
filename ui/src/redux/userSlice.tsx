@@ -1,20 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { AppDispatch } from "./store"
 import axios from "axios"
-import { userIdentityUrl, userOthersUrl, userUpdateBioUrl, userUrl, usersUrl } from "../variables/urls"
+import { toggleFollowUrl, unfollowedUsersUrl, userIdentityUrl, userUpdateBioUrl, userUrl, usersUrl } from "../variables/urls"
 import { UserIdentity } from "../types/UserIdentity"
 window.Buffer = window.Buffer || require('buffer').Buffer
 
 type userState = {
   userIdentity: UserIdentity | null,
-  others: UserIdentity[],
+  unfollowedUsers: UserIdentity[],
   users: UserIdentity[],
   currentUser: UserIdentity | null, 
 }
 
 const initialState: userState = {
   userIdentity: null,
-  others: [],
+  unfollowedUsers: [],
   users: [],
   currentUser: null
 }
@@ -26,19 +26,31 @@ export const userSlice = createSlice({
     setUserIdentity(state, action) {
       state.userIdentity = action.payload
     },
-    setOtherUsers(state, action) {
-      state.others = action.payload
+    setUnfollowedUsers(state, action) {
+      state.unfollowedUsers = action.payload
     },
     setUsers(state, action) {
       state.users = action.payload
     },
     setCurrentUser(state, action) {
       state.currentUser = action.payload
+    },
+    toggleFollowReducer(state, action) {
+      if (state.currentUser) state.currentUser.followers = action.payload.followers;
+      if (state.userIdentity) state.userIdentity.following = action.payload.following;
+      const index = state.unfollowedUsers.findIndex(user => user.username === action.payload.other_user);
+      if (index !== -1) {
+        state.unfollowedUsers.splice(index);
+      }
+      else {
+        const other_user = state.users.find((user) => user.username === action.payload.other_user);
+        if (other_user) state.unfollowedUsers.push(other_user);
+      }
     }
   }
 })
 
-export const { setUsers, setUserIdentity, setOtherUsers, setCurrentUser } = userSlice.actions;
+export const { setUsers, setUserIdentity, setUnfollowedUsers, setCurrentUser, toggleFollowReducer } = userSlice.actions;
 
 export const getUserIdentity = () => async (dispath: AppDispatch) => {
   try {
@@ -60,10 +72,10 @@ export const getUsers = () => async (dispatch: AppDispatch) => {
   }
 }
 
-export const getOtherUsers = () => async (dispatch: AppDispatch) => {
+export const getUnfollowedUsers = () => async (dispatch: AppDispatch) => {
   try {
-    const res = await axios.get(userOthersUrl);
-    dispatch(setOtherUsers(res.data))
+    const res = await axios.get(unfollowedUsersUrl);
+    dispatch(setUnfollowedUsers(res.data))
   } catch(err) {
     console.error(err);
   }
@@ -93,6 +105,20 @@ export const updateBio = async (fileCover?: File, fileAvatar?: File, name?: stri
     bio
   });
   return res.data;
+}
+
+export const toggleFollow = (username: string) => async (dispatch: AppDispatch) => {
+  try {
+    const res = await axios.post(toggleFollowUrl, {username});
+    dispatch(toggleFollowReducer({
+      followers: res.data.following.followers,
+      following: res.data.follower.following,
+      other_user: res.data.following.username,
+    }));
+    return true;
+  } catch(err) {
+    return false;
+  }
 }
 
 export const userSliceReducer = userSlice.reducer

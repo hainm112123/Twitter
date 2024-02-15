@@ -14,8 +14,9 @@ import { logout } from "../../../redux/authSlice";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import NewTweetModal from "../tweet/NewTweetModal";
-import { getProfileTweets, getTweets } from "../../../redux/tweetSlice";
+import { addTweet, getProfileTweets, getTweets } from "../../../redux/tweetSlice";
 import Loader from "../Loader";
+import { TweetType } from "../../../types/TweetType";
 
 type Props = {}
 
@@ -41,6 +42,7 @@ const LeftSidebar = (props: Props) => {
   const access_token = token.access_token ?? cookies.access_token;
   const refresh_token = token.refresh_token ?? cookies.refresh_token;
   const userIdentity = useSelector((state: RootState) => state.user.userIdentity)
+  const currentUser = useSelector((state: RootState) => state.user.currentUser);
 
   const onLogoutClicked = () => {
     removeCookie('access_token', {path: '/'});
@@ -71,7 +73,7 @@ const LeftSidebar = (props: Props) => {
         {
           items.map((item, index) => {
             const active = item.state === 'profile' ? (states[1] === 'profile' && states[2] === userIdentity.username) : 
-                           (item.state == 'home' ? states[1] === '' : item.state === states[1]);
+                           (item.state === 'home' ? states[1] === '' : item.state === states[1]);
             return (
             <ListItem key={index} disablePadding sx={{width: "fit-content"}}>
               <Link 
@@ -149,9 +151,11 @@ const LeftSidebar = (props: Props) => {
         <NewTweetModal 
           modalOpen={modalOpen} 
           setModalOpen={setModalOpen} 
-          success={() => {
-            dispatch(getTweets());
-            dispatch(getProfileTweets(userIdentity.username))
+          success={(response: TweetType | null) => {
+            if (response) dispatch(addTweet({
+              tweet: response,
+              currentUser: currentUser?.username,
+            }))
           }} 
         />
       </Box>

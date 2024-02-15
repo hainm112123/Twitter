@@ -12,14 +12,17 @@ import moment from "moment";
 import { fontConfig } from "../../../configs/fontConfig";
 import Loader from "../Loader";
 import NewTweetModal from "./NewTweetModal";
-import TweetType from "../../../types/TweetType";
+import { TweetType } from "../../../types/TweetType";
 import { UserIdentity } from "../../../types/UserIdentity";
 import { useAppDispatch } from "../../../redux/store";
 import { addReply_brief } from "../../../redux/tweetSlice";
+import { RepeatOutlined } from "@mui/icons-material";
+import { InView } from "react-intersection-observer";
 
 type Props = {
   tweet: TweetType,
-  user: UserIdentity | undefined, 
+  user: UserIdentity | undefined,
+  loadMoreTweets?: Function,
   detail?: boolean, 
   isReply?: boolean, 
   isParent?: boolean,
@@ -29,6 +32,7 @@ type Props = {
 const Tweet = ({tweet, user, ...props}: Props) => {
   const [isLoaded, setLoaded] = useState(false);
   const [replyModalOpen, setReplyModalOpen] = useState(false);
+  const [tweetsLoading, setTweetsLoading] = useState(false);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -83,10 +87,14 @@ const Tweet = ({tweet, user, ...props}: Props) => {
   }
 
   return (
-    <Box>
-      {/* {
-        (tweet.is_reply_of && !props.isReply) && (<Tweet tweet={parentTweet} isParent />)
-      } */}
+    <InView onChange={(inView) => {
+      if (inView && !tweetsLoading && props.loadMoreTweets) {
+        setTweetsLoading(true);
+        props.loadMoreTweets().then(() => {
+          setTweetsLoading(false);
+        })
+      }
+    }}>
 
       <NewTweetModal 
         modalOpen={replyModalOpen} 
@@ -111,30 +119,50 @@ const Tweet = ({tweet, user, ...props}: Props) => {
       >
         <Link to={`/${user.username}/tweet/${tweet.id}`} style={{all: "unset"}}>
           {/* Note */}
-          {/* <Box
-            sx={{
-              display: "flex",
-              color: fontConfig.color.secondaryText,
-              paddingBottom: "8px"
-            }}
-          >
-            <RepeatOutlined
-              sx={{
-                fontSize: fontConfig.size.secondaryIcon,
-                paddingLeft: "20px",
-                paddingRight: "8px",
-                fontWeight: fontConfig.weight.bold,
-              }}
-            />
-            <Typography
-              sx={{
-                fontSize: fontConfig.size.secondaryText,
-                fontWeight: fontConfig.weight.bold,
-              }}
-            >
-              Yuuhi reposted
-            </Typography>
-          </Box> */}
+          {
+            tweet.retweet_user && (
+              <Box
+                sx={{
+                  display: "flex",
+                  color: fontConfig.color.secondaryText,
+                  paddingBottom: "8px"
+                }}
+              >
+                <RepeatOutlined
+                  sx={{
+                    fontSize: fontConfig.size.secondaryIcon,
+                    paddingLeft: "20px",
+                    paddingRight: "8px",
+                    fontWeight: fontConfig.weight.bold,
+                  }}
+                />
+                <Typography
+                  sx={{
+                    fontSize: fontConfig.size.secondaryText,
+                    fontWeight: fontConfig.weight.bold,
+                  }}
+                >
+                  <Link 
+                    to={'/profile/' + tweet.retweet_user}
+                    style={{
+                      all: 'unset',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        "&:hover": {
+                          textDecoration: "underline",
+                          cursor: "pointer"
+                        }
+                      }}
+                    >
+                      {tweet.retweet_user} &#160;&#160; retweeted
+                    </Box>
+                  </Link>
+                </Typography>
+              </Box>
+            )
+          }
 
           {/* Main */}
           {
@@ -184,7 +212,7 @@ const Tweet = ({tweet, user, ...props}: Props) => {
         
         </Link>
       </Box>
-    </Box>
+    </InView>
   )
 }
 

@@ -8,8 +8,7 @@ import RightSidebar from '../common/sidebar/RightSidebar';
 import { useCookies } from 'react-cookie';
 import { RootState, useAppDispatch } from '../../redux/store';
 import { useSelector } from 'react-redux';
-import { getOtherUsers, getUserIdentity, getUsers } from '../../redux/userSlice';
-import { getTweets } from '../../redux/tweetSlice';
+import { getUnfollowedUsers, getUserIdentity, getUsers } from '../../redux/userSlice';
 
 function MainLayout() {
   const [ cookies ] = useCookies();
@@ -32,8 +31,7 @@ function MainLayout() {
       return;
     }
     dispatch(getUserIdentity());
-    dispatch(getOtherUsers());
-    dispatch(getTweets());
+    dispatch(getUnfollowedUsers());
     dispatch(getUsers());
   }, [navigate, access_token, refresh_token, dispatch, isLoaded])
 

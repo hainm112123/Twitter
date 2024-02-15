@@ -1,4 +1,5 @@
-from sqlalchemy import String, ForeignKey, Integer, ARRAY, LargeBinary, DateTime, PickleType, Boolean
+from sqlalchemy import String, ForeignKey, Integer, LargeBinary, DateTime, PickleType, Boolean
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from db import db
 from dataclasses import dataclass
@@ -53,7 +54,18 @@ class Tweet(db.Model):
   views: Mapped[int] = mapped_column(Integer, default=0)
   created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
   is_reply_of: Mapped[int] = mapped_column(Integer, nullable=True)
+  is_retweet_of: Mapped[int] = mapped_column(Integer, ForeignKey('tweet.id'), nullable=True)
+  original_tweet: Mapped[int] = relationship('Tweet', remote_side=[id], uselist=False)
   
   def to_dict(self):
     return {col.name: getattr(self, col.name) for col in self.__table__.columns}
+  
+@dataclass
+class Post(db.Model):
+  __tablename__ = 'posts'
+  id: Mapped[int] = mapped_column(Integer, primary_key=True)
+  author: Mapped[str] = mapped_column(String)
+  text: Mapped[str] = mapped_column(String, default="")
+  is_repost_of: Mapped[int] = mapped_column(Integer, ForeignKey('posts.id'), nullable=True)
+  original_post: Mapped[int] = relationship('Post', remote_side=[id], uselist=False)
   

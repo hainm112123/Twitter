@@ -1,21 +1,23 @@
-import { Avatar, Box, Button, Modal, ThemeProvider, Typography } from "@mui/material"
+import { Avatar, Box, Button, CircularProgress, Modal, ThemeProvider, Typography } from "@mui/material"
 import { sizeConfig } from "../../../configs/sizeConfig"
 import { fontConfig } from "../../../configs/fontConfig"
 import { colorConfig } from "../../../configs/colorConfig"
 import { CalendarMonthOutlined } from "@mui/icons-material"
 import { useSelector } from "react-redux"
-import { RootState } from "../../../redux/store"
+import { RootState, useAppDispatch } from "../../../redux/store"
 import { useState } from "react"
 import theme from "../../styled/theme"
 import EditProfile from "./EditProfile"
 import ProfileAvatar from "./ProfileAvatar"
 import moment from "moment"
+import Loader from "../../common/Loader"
+import { toggleFollow } from "../../../redux/userSlice"
 
 type Props = {
   name: any,
   username: any,
-  follwersCount: any,
-  followingCount: any,
+  follwers: any,
+  following: any,
   currentAvatar: any,
   currentCover: any,
   bio: any,
@@ -25,6 +27,16 @@ type Props = {
 const ProfileBio = (props: Props) => {
   const userIdentity = useSelector((state: RootState) => state.user.userIdentity);
   const [modalOpen, setModalOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const [followLoading, setFollowLoading] = useState(false);
+
+  if (!userIdentity) {
+    return <Loader />
+  }
+
+  const index = userIdentity.following.findIndex((temp => temp === props.username));
+  const themeClass = index === -1 ? 'light' : 'dark';
+  const buttonText = index === -1 ? 'Follow' : 'Following'
 
   return (
     <Box
@@ -72,10 +84,26 @@ const ProfileBio = (props: Props) => {
 
         {
           userIdentity?.username !== props.username && <ThemeProvider theme={theme}>
-            <Button
-              className="light"
+            <Button 
+              className={themeClass}
+              onClick={() => {
+                if (followLoading) return;
+                setFollowLoading(true)
+                dispatch(toggleFollow(props.username)).then(() => {
+                  setFollowLoading(false);
+                });
+              }}
+              sx={[
+                index !== -1 && {
+                  "&:hover": {
+                    color: colorConfig.danger,
+                    borderColor: colorConfig.danger,
+                    bgcolor: "transparent"
+                  }
+                }
+              ]}
             >
-              Follow
+              {followLoading ? <CircularProgress size="24px" sx={{ml: 3, mr: 3}} /> : buttonText}
             </Button>
           </ThemeProvider>
         }
@@ -129,7 +157,7 @@ const ProfileBio = (props: Props) => {
               fontWeight: fontConfig.weight.bold,
               fontSize: fontConfig.size.text_2
             }}>
-              {props.followingCount}
+              {props.following.length}
             </Typography>
             <Typography sx={{
               color: fontConfig.color.secondaryText,
@@ -148,7 +176,7 @@ const ProfileBio = (props: Props) => {
               fontWeight: fontConfig.weight.bold,
               fontSize: fontConfig.size.text_2
             }}>
-              {props.follwersCount}
+              {props.follwers.length}
             </Typography>
             <Typography sx={{
               color: fontConfig.color.secondaryText,

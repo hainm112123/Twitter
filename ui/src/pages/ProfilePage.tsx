@@ -19,7 +19,7 @@ const ProfilePage = (props: Props) => {
   const [isLoaded, setLoaded] = useState(false);
   const { username } = useParams();
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
-  const profileTweets = useSelector((state: RootState) => state.tweet.profileTweets);
+  const profileTweetsData = useSelector((state: RootState) => state.tweet.profile);
 
   useEffect(() => {
     if (!isLoaded) {
@@ -27,7 +27,7 @@ const ProfilePage = (props: Props) => {
       return;
     }
     dispatch(getCurrentUser(username));
-    dispatch(getProfileTweets(username));
+    dispatch(getProfileTweets.get(username));
   }, [isLoaded, dispatch, username])
 
   if (!currentUser) {
@@ -37,22 +37,22 @@ const ProfilePage = (props: Props) => {
   return (
     <Box sx={{position: 'relative'}}>
       {/* profile */}
-      <ProfileHeader name={currentUser?.name} tweetsCount={profileTweets.length} />
+      <ProfileHeader name={currentUser?.name} tweetsCount={profileTweetsData.tweets.length} />
 
       <ProfileCover currentCover={currentUser?.cover} />
 
       <ProfileBio 
         name={currentUser.name} 
         username={currentUser.username} 
-        followingCount={currentUser.following.length} 
-        follwersCount={currentUser.followers.length} 
+        following={currentUser.following} 
+        follwers={currentUser.followers} 
         currentAvatar={currentUser.avatar} 
         currentCover={currentUser.cover} 
         bio={currentUser.bio}
         joined_date={currentUser.joined_date}
       />
       <ProfileTabs username={currentUser.username} />
-      <ProfileTweets tweets={profileTweets} user={currentUser} />
+      <ProfileTweets data={profileTweetsData} username={currentUser.username} />
     </Box>
   )
 }

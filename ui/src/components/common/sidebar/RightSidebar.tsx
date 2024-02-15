@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 type Props = {}
 
 const RightSidebar = (props: Props) => {
-  const otherUsers = useSelector((state: RootState) => state.user.others);
+  const unfollowedUsers = useSelector((state: RootState) => state.user.unfollowedUsers);
 
   return (
     <Box
@@ -41,7 +41,7 @@ const RightSidebar = (props: Props) => {
         </Box>
         <List>
           {
-            otherUsers.map((user, index) => (
+            unfollowedUsers.map((user, index) => (
               <ListItem disablePadding key={index} sx={{
                 '&:hover': {
                   bgcolor: "rgba(255,255,255,0.03)"

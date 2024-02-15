@@ -1,22 +1,19 @@
 import { Box } from "@mui/material"
 import Tweet from "../../common/tweet/Tweet"
-import TweetType from "../../../types/TweetType"
-import { UserIdentity } from "../../../types/UserIdentity"
+import { TweetType, TweetsData } from "../../../types/TweetType"
+import { useSelector } from "react-redux"
+import { RootState } from "../../../redux/store"
+import Tweets from "../../common/tweet/Tweets"
+import { getProfileTweets } from "../../../redux/tweetSlice"
 
 type Props = {
-  tweets: TweetType[],
-  user: UserIdentity,
+  data: TweetsData,
+  username: string,
 }
 
-const ProfileTweets = ({ tweets, user }: Props) => {
+const ProfileTweets = ({ data, username }: Props) => {
   return (
-    <Box>
-      {
-        tweets.map((tweet, index) => (
-          <Tweet tweet={tweet} user={user} key={index} />
-        ))
-      }
-    </Box>
+    <Tweets data={data} getMore={getProfileTweets.getMore} urlSuffix={username} />
   )
 }
 

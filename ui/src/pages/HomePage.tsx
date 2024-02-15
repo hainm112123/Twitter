@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import Tweet from "../components/common/tweet/Tweet";
 import { colorConfig } from "../configs/colorConfig";
 import Header from "../components/common/header/Header";
@@ -8,8 +8,10 @@ import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../redux/store";
 import Loader from "../components/common/Loader";
 import { fontConfig } from "../configs/fontConfig";
-import { addTweet } from "../redux/tweetSlice";
-import TweetType from "../types/TweetType";
+import { addTweet, getFollowingTweets, getTweets } from "../redux/tweetSlice";
+import { TweetType } from "../types/TweetType";
+import ForyouTweets from "../components/pages/HomePage/ForyouTweets";
+import FollowingTweets from "../components/pages/HomePage/FollowingTweets";
 
 type Props = {}
 
@@ -64,18 +66,26 @@ const HomePage = (props: Props) => {
   const dispatch = useAppDispatch();
 
   const FORYOU = 'for-you', FOLLOWING = 'following';
-  const tweets = useSelector((state: RootState) => state.tweet.tweets);
-  const users = useSelector((state: RootState) => state.user.users);
+  const [filter, setFilter] = useState(FORYOU);
+  const [loaded, setLoaded] = useState(false);
+  
   const userIdentity = useSelector((state: RootState) => state.user.userIdentity);
-  const [filter, setFilter] = useState(FORYOU)
+  const currentUser = useSelector((state: RootState) => state.user.currentUser);
 
-  if (!userIdentity) {
+  useEffect(() => {
+    Promise.all([
+      dispatch(getTweets.get()),
+      dispatch(getFollowingTweets.get())
+    ]).then(() => {
+      setLoaded(true);
+    })
+  }, [dispatch])
+
+  if (!userIdentity || !loaded) {
     return (
       <Loader />
     )
   }
-
-  // if (filter === FOLLOWING) tweets = tweets.filter((tweet) => userIdentity.following.findIndex((user) => user === tweet.author) !== -1)
 
   return (
     <Box>
@@ -95,19 +105,16 @@ const HomePage = (props: Props) => {
         }}
       >
         <NewTweet success={(response: TweetType | null) => {
-          if (response) dispatch(addTweet(response));
+          if (response) dispatch(addTweet({
+            tweet: response,
+            currentUser: currentUser?.username,
+          }));
         }} />
       </Box>
 
       {/* tweets */}
       {
-        tweets.map((tweet, index) => (
-          <Tweet 
-            tweet={tweet} 
-            user={users.find((user) => user.username === tweet.author)}
-            key={index} 
-          />
-        ))
+        filter === FORYOU ? <ForyouTweets /> : <FollowingTweets />
       }
     </Box>
   )

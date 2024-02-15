@@ -8,7 +8,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { BookmarkBorder, EqualizerOutlined, FavoriteBorder, FileUploadOutlined, RepeatOutlined, Favorite, ChatBubble, Bookmark } from "@mui/icons-material";
 import { RootState, useAppDispatch } from "../../../redux/store"
 import { useSelector } from "react-redux"
-import { toggleLikeTweet } from "../../../redux/tweetSlice"
+import { toggleLikeTweet, toggleRetweet } from "../../../redux/tweetSlice"
 import { motion } from 'framer-motion'
 
 type InterractButton = {
@@ -144,8 +144,9 @@ const TweetInteract = (props: Props) => {
           ActiveIcon={RepeatOutlined}
           onClick={(e) => {
             e.preventDefault();
+            dispatch(toggleRetweet(props.id, userIdentity.username));
           }}
-          active={false}
+          active={props.retweets.findIndex(temp => temp === userIdentity.username) !== -1}
         />
         
         <InteractButton 

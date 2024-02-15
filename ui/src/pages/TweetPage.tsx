@@ -11,7 +11,8 @@ import Loader from "../components/common/Loader";
 import NewTweet from "../components/common/tweet/NewTweet";
 import { colorConfig } from "../configs/colorConfig";
 import { addReply, getCurrentTweet, getParentTweet, getReplies } from "../redux/tweetSlice";
-import TweetType from "../types/TweetType";
+import { TweetType } from "../types/TweetType";
+import Tweets from "../components/common/tweet/Tweets";
 
 type Props = {}
 
@@ -19,9 +20,11 @@ const TweetPage = (props: Props) => {
   const [loaded, setLoaded] = useState(false);
   const tweetId = Number(useParams().id);
   const dispatch = useAppDispatch();
+
   const tweet = useSelector((state: RootState) => state.tweet.currentTweet);
-  const replies = useSelector((state: RootState) => state.tweet.replies);
+  const data = useSelector((state: RootState) => state.tweet.reply);
   const parentTweets = useSelector((state: RootState) => state.tweet.parentTweets);
+  
   const users = useSelector((state: RootState) => state.user.users);
   const user = users.find((user) => user.username === tweet?.author);
   
@@ -32,7 +35,7 @@ const TweetPage = (props: Props) => {
     }
     dispatch(getCurrentTweet(tweetId));
     dispatch(getParentTweet(tweetId));
-    dispatch(getReplies(tweetId));
+    dispatch(getReplies.get(tweetId));
   }, [dispatch, tweetId, loaded])
 
   if (!tweet || !user) {
@@ -69,12 +72,13 @@ const TweetPage = (props: Props) => {
           success={replySuccess} 
         />
       </Box>
-      {
+      {/* {
         replies.map((reply, index) => {
           const user = users.find((user) => user.username === reply.author);
           return (<Tweet tweet={reply} user={user} key={index} isReply />);
         })
-      }
+      } */}
+      <Tweets data={data} getMore={getReplies.getMore} urlSuffix={tweetId} isReply />
     </Box>
   )
 }

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-import base64, re, boto3, uuid
+import base64, re, boto3, uuid, copy
 from sqlalchemy.orm import defer, load_only
 
 from models import User
@@ -50,13 +50,12 @@ def user_identity():
   user = User.query.get_or_404(get_jwt_identity()["id"])
   return jsonify(user)
 
-@user.route('/others')
+@user.route('/unfollowed')
 @jwt_required()
-def others(): 
-  users = User.query.all()
-  user = get_jwt_identity()
-  users = [_user for _user in users if _user.id != user["id"]]
-  return jsonify(users)
+def get_unfollowed_users(): 
+  username = get_jwt_identity()['username']
+  users = db.session.execute(db.select(User).where((User.username != username) & (~User.followers.any(username)))).scalars()
+  return jsonify(list(users))
 
 @user.route('/update-bio', methods=['POST'])
 @jwt_required()
@@ -73,3 +72,32 @@ def update_bio():
         setattr(user, key, new_user_bio[key])
   db.session.commit()
   return jsonify(user)
+
+@user.route('/toggle-follow', methods=['POST'])
+@jwt_required()
+def toggle_follow():
+  user = User.query.get_or_404(get_jwt_identity()['id'])
+  other_user = db.session.execute(db.select(User).where(User.username == request.json['username'])).scalar()
+  followers = copy.copy(other_user.followers)
+  following = copy.copy(user.following)
+  try:
+    follower_index = followers.index(user.username)
+    following_index = following.index(other_user.username)
+    followers.pop(follower_index)
+    following.pop(following_index)
+  except:
+    followers.append(user.username)
+    following.append(other_user.username)
+  other_user.followers = followers
+  user.following = following
+  db.session.commit()
+  return {
+    "follower": {
+      "username": user.username,
+      "following": following,
+    },
+    "following": {
+      "username": other_user.username,
+      "followers": followers,
+    }
+  }, 200

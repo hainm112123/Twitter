@@ -5,6 +5,8 @@ import { fontConfig } from "../../../configs/fontConfig"
 import { UserIdentity } from "../../../types/UserIdentity"
 import theme from "../../styled/theme"
 import { styleConfig } from "../../../configs/styleConfig"
+import { useAppDispatch } from "../../../redux/store"
+import { toggleFollow } from "../../../redux/userSlice"
 
 type Props = {
   self: boolean,
@@ -13,6 +15,7 @@ type Props = {
 
 const UserInfor = ({self, userIdentity}: Props) => {
   const defaultAvatar = 'url(https://pbs.twimg.com/profile_images/1698531056839012352/QDbb_7_3_400x400.png)'
+  const dispatch = useAppDispatch();
 
   return (
     <Box
@@ -25,7 +28,6 @@ const UserInfor = ({self, userIdentity}: Props) => {
       <Box
         sx={{
           ...styleConfig.avatar,
-          // backgroundImage: (userIdentity.avatar ? `url('data:image/png;base64,${userIdentity.avatar}')` : defaultAvatar),
           backgroundImage: (userIdentity.avatar ? `url(${userIdentity.avatar})` : defaultAvatar),
         }}
       />
@@ -60,6 +62,7 @@ const UserInfor = ({self, userIdentity}: Props) => {
             }}
             onClick={(e) => {
               e.preventDefault();
+              dispatch(toggleFollow(userIdentity.username))
             }}
           >
             Follow
