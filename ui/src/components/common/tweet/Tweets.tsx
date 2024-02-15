@@ -22,7 +22,8 @@ const Tweets = ({ data, getMore, isReply, urlSuffix } : Props) => {
         data.tweets.map((tweet, index) => (
           <Tweet 
             tweet={tweet} 
-            user={users.find((user) => user.username === tweet.author)}
+            // user={users.find((user) => user.username === tweet.author)}
+            user={users[tweet.author]}
             key={index}
             loadMoreTweets={async () => {
               if (index !== data.tweetsCount - 2 || data.loadedAll) return;

@@ -41,15 +41,28 @@ const RightSidebar = (props: Props) => {
         </Box>
         <List>
           {
-            unfollowedUsers.map((user, index) => (
+            // unfollowedUsers.map((user, index) => (
+            // <ListItem disablePadding key={index} sx={{
+            //     '&:hover': {
+            //       bgcolor: "rgba(255,255,255,0.03)"
+            //     }
+            //   }}>
+            //     <Link style={{textDecoration: "none", color: "unset", flex: 1}} to={`/profile/${user.username}`}>
+            //       <ListItemButton>
+            //         <UserInfor self={false} userIdentity={user} />
+            //       </ListItemButton>
+            //     </Link>
+            //   </ListItem>
+            // ))
+            Object.keys(unfollowedUsers).map((key, index) => (
               <ListItem disablePadding key={index} sx={{
                 '&:hover': {
                   bgcolor: "rgba(255,255,255,0.03)"
                 }
               }}>
-                <Link style={{textDecoration: "none", color: "unset", flex: 1}} to={`/profile/${user.username}`}>
+                <Link style={{textDecoration: "none", color: "unset", flex: 1}} to={`/profile/${unfollowedUsers[key].username}`}>
                   <ListItemButton>
-                    <UserInfor self={false} userIdentity={user} />
+                    <UserInfor self={false} userIdentity={unfollowedUsers[key]} />
                   </ListItemButton>
                 </Link>
               </ListItem>

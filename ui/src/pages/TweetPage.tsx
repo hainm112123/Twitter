@@ -26,7 +26,7 @@ const TweetPage = (props: Props) => {
   const parentTweets = useSelector((state: RootState) => state.tweet.parentTweets);
   
   const users = useSelector((state: RootState) => state.user.users);
-  const user = users.find((user) => user.username === tweet?.author);
+  // const user = users.find((user) => user.username === tweet?.author);
   
   useEffect(() => {
     if (!loaded) {
@@ -38,10 +38,15 @@ const TweetPage = (props: Props) => {
     dispatch(getReplies.get(tweetId));
   }, [dispatch, tweetId, loaded])
 
-  if (!tweet || !user) {
+  if (!tweet) {
     return (
       <Loader />
     )
+  }
+
+  const user = users[tweet.author];
+  if (!user) {
+    return <Loader />
   }
 
   const replySuccess = (response: TweetType | null) => {
@@ -57,7 +62,8 @@ const TweetPage = (props: Props) => {
       </HeaderWithBack>
       {
         parentTweets.map((tweet, index) => {
-          const user = users.find((user) => user.username === tweet.author);
+          // const user = users.find((user) => user.username === tweet.author);
+          const user = users[tweet.author];
           return (<Tweet tweet={tweet} user={user} key={index} isParent />)
         })
       }

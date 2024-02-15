@@ -5,17 +5,21 @@ import { toggleFollowUrl, unfollowedUsersUrl, userIdentityUrl, userUpdateBioUrl,
 import { UserIdentity } from "../types/UserIdentity"
 window.Buffer = window.Buffer || require('buffer').Buffer
 
+type UsersType = {[key: string]: any};
+
 type userState = {
   userIdentity: UserIdentity | null,
-  unfollowedUsers: UserIdentity[],
-  users: UserIdentity[],
+  // unfollowedUsers: UserIdentity[],
+  // users: UserIdentity[],
+  users: UsersType,
+  unfollowedUsers: UsersType,
   currentUser: UserIdentity | null, 
 }
 
 const initialState: userState = {
   userIdentity: null,
-  unfollowedUsers: [],
-  users: [],
+  unfollowedUsers: {},
+  users: {},
   currentUser: null
 }
 
@@ -38,19 +42,32 @@ export const userSlice = createSlice({
     toggleFollowReducer(state, action) {
       if (state.currentUser) state.currentUser.followers = action.payload.followers;
       if (state.userIdentity) state.userIdentity.following = action.payload.following;
-      const index = state.unfollowedUsers.findIndex(user => user.username === action.payload.other_user);
-      if (index !== -1) {
-        state.unfollowedUsers.splice(index);
+      // const index = state.unfollowedUsers.findIndex(user => user.username === action.payload.other_user);
+      // if (index !== -1) {
+      //   state.unfollowedUsers.splice(index);
+      // }
+      // else {
+      //   const other_user = state.users.find((user) => user.username === action.payload.other_user);
+      //   if (other_user) state.unfollowedUsers.push(other_user);
+      // }
+      const key = action.payload.other_user;
+      if (key in state.unfollowedUsers) {
+        delete state.unfollowedUsers[key];
       }
       else {
-        const other_user = state.users.find((user) => user.username === action.payload.other_user);
-        if (other_user) state.unfollowedUsers.push(other_user);
+        state.unfollowedUsers[key] = state.users[key];
       }
     }
   }
 })
 
 export const { setUsers, setUserIdentity, setUnfollowedUsers, setCurrentUser, toggleFollowReducer } = userSlice.actions;
+
+const toObject = (users: UserIdentity[]) => {
+  let result: UsersType = {}
+  for (const user of users) result[user.username] = user;
+  return result;
+}
 
 export const getUserIdentity = () => async (dispath: AppDispatch) => {
   try {
@@ -64,7 +81,8 @@ export const getUserIdentity = () => async (dispath: AppDispatch) => {
 export const getUsers = () => async (dispatch: AppDispatch) => {
   try {
     const res = await axios.get(usersUrl);
-    dispatch(setUsers(res.data));
+    // dispatch(setUsers(res.data));
+    dispatch(setUsers(toObject(res.data)));
     return res.data;
   }
   catch(err) {
@@ -75,7 +93,8 @@ export const getUsers = () => async (dispatch: AppDispatch) => {
 export const getUnfollowedUsers = () => async (dispatch: AppDispatch) => {
   try {
     const res = await axios.get(unfollowedUsersUrl);
-    dispatch(setUnfollowedUsers(res.data))
+    // dispatch(setUnfollowedUsers(res.data))
+    dispatch(setUnfollowedUsers(toObject(res.data)));
   } catch(err) {
     console.error(err);
   }

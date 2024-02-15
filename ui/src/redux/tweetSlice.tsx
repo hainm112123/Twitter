@@ -136,16 +136,24 @@ const configTweet = async (tweet: any) => {
 const GetTweetsFunctions = (url: string, key: string) => {
   return ({
     get: (suffix?: string | number) => async (dispatch: AppDispatch) => {
-      const _url = suffix ? url + suffix : url;
-      const res = await axios.get(_url + '?tweets-count=0');
-      const tweets = await Promise.all(res.data.map(configTweet));
-      dispatch(setTweets({ key, tweets }));
+      try {
+        const _url = suffix ? url + suffix : url;
+        const res = await axios.get(_url + '?tweets-count=0');
+        const tweets = await Promise.all(res.data.map(configTweet));
+        dispatch(setTweets({ key, tweets }));
+      } catch(err) {
+        return null;
+      }
     },
     getMore: (tweetsCount: number, suffix?: string | number) => async (dispatch: AppDispatch) => {
-      const _url = suffix ? url + suffix : url;
-      const res = await axios.get(_url + '?tweets-count=' + tweetsCount);
-      const tweets = await Promise.all(res.data.map(configTweet));
-      dispatch(appTweets({ key, tweets }));
+      try {
+        const _url = suffix ? url + suffix : url;
+        const res = await axios.get(_url + '?tweets-count=' + tweetsCount);
+        const tweets = await Promise.all(res.data.map(configTweet));
+        dispatch(appTweets({ key, tweets }));
+      } catch(err) {
+        return null;
+      }
     }
   })
 }
